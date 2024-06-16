@@ -2,17 +2,16 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { View, Text, Button } from "react-native";
 import useAuth from "../hooks/useAuth";
 import HomePage from "../pages/HomePage";
-import LogoutButton from "../components/LogoutButton";
+//import LogoutButton from "../components/LogoutButton";
 
 const Stack = createNativeStackNavigator();
 function AppStack() {
-  const { logout } = useAuth();
+  //const { logout } = useAuth();
   return (
-    <Stack.Navigator screenOptions={{headerRight: () => <LogoutButton logoutHandler={logout}/>
-    }}>
+    <Stack.Navigator screenOptions={{headerShown:false}}>
       <Stack.Screen
         name="Home"
-        component={HomePage}
+        component={HomePage}//Por eso te manda a Home primero
       />
     </Stack.Navigator>
   );

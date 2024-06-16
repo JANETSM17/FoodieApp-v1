@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, ViewProps, ActivityIndicator } from "react-native";
+import { StyleSheet, Text, Button, View, TouchableOpacity, ViewProps, ActivityIndicator } from "react-native";
 import demoService from '../services/demoService'
 import { User } from '../types/user.type'
-// import useAuth from "../hooks/useAuth";
+import useAuth from "../hooks/useAuth";
 
 
 function LoginPage() {
+    const { logout } = useAuth();
     const [loading, setLoading] = useState(true);
     const [data,  setData] = useState<User | undefined>(undefined);
 
@@ -38,6 +39,7 @@ function LoginPage() {
         <View style={styles.mainContainer}>
             <View style={styles.loginContainer}>
                 <Text style={styles.loginTitle}>{data?.address?.address}</Text>
+                <Button title="Cerrar sesión" onPress={logout} />
             </View>
         </View>
     );

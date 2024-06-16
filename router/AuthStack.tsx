@@ -1,25 +1,38 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useState, useEffect } from 'react';
-import { View, Text } from "react-native";
+import LandingPage from "../pages/LandingPage";
+import FirstSplashScreen from "../pages/FirstSplashScreenPage";
+import SecondSplashScreen from "../pages/SecondSplashScreenPage";
 import LoginPage from "../pages/LoginPage";
-import SplashScreen from "../pages/SplashScreenPage";
 
 const Stack = createNativeStackNavigator();
+
 function AuthStack() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [currentScreen, setCurrentScreen] = useState('FirstSplash');
 
   useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000); // milisegundos que va a aparecer la splashscreen
-  }, []);
+    if (currentScreen === 'FirstSplash') {
+      setTimeout(() => {
+        setCurrentScreen('SecondSplash');
+      }, 2000); // Mostrar la primera splash screen durante 2 segundos
+    } else if (currentScreen === 'SecondSplash') {
+      setTimeout(() => {
+        setCurrentScreen('Landing');
+      }, 2000); // Mostrar la segunda splash screen durante 2 segundos
+    }
+  }, [currentScreen]);
 
-  if (isLoading) {
-    return <SplashScreen />;
+  if (currentScreen === 'FirstSplash') {
+    return <FirstSplashScreen />;
+  }
+
+  if (currentScreen === 'SecondSplash') {
+    return <SecondSplashScreen />;
   }
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Landing" component={LandingPage} />
       <Stack.Screen name="Login" component={LoginPage} />
     </Stack.Navigator>
   );
