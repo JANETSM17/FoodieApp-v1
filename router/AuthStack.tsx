@@ -4,6 +4,7 @@ import LandingPage from "../pages/LandingPage";
 import FirstSplashScreen from "../pages/FirstSplashScreenPage";
 import SecondSplashScreen from "../pages/SecondSplashScreenPage";
 import LoginPage from "../pages/LoginPage";
+import HomePage from "../pages/HomePage";
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +35,7 @@ function AuthStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Landing" component={LandingPage} />
       <Stack.Screen name="Login" component={LoginPage} />
+      {/* <Stack.Screen name="Home" component={HomePage} /> */}
     </Stack.Navigator>
   );
 }

@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { authHost } from "../constants/auth.constants";
 
 async function demoService() {
 
@@ -11,7 +12,7 @@ async function demoService() {
     
     const { token } = JSON.parse(authDataSerialize)
       
-    const response = await fetch('https://dummyjson.com/auth/me', {
+    const response = await fetch(`${authHost}auth/me`, {
       method: "GET",
       headers: { 
         "Content-Type": "application/json", 

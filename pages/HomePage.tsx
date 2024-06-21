@@ -5,7 +5,7 @@ import { User } from '../types/user.type'
 import useAuth from "../hooks/useAuth";
 
 
-function LoginPage() {
+function HomePage() {
     const { logout } = useAuth();
     const [loading, setLoading] = useState(true);
     const [data,  setData] = useState<User | undefined>(undefined);
@@ -26,12 +26,18 @@ function LoginPage() {
         setLoading(false)
     };
 
-    if(loading || !data){
+    if (loading) {
         return (
             <View style={styles.mainContainer}>
-                <ActivityIndicator/>
+                <ActivityIndicator size="large" color="#1E90FF" />
             </View>
         );
+    }
+
+    if (!data) {
+        // Si no hay datos, navegar a la pantalla de Login
+        logout();
+        return null; // Retornar null porque la navegación ya se maneja
     }
     
 
@@ -105,4 +111,6 @@ const styles = StyleSheet.create({
 });
 
 
-export default LoginPage
+export default HomePage
+
+//{data?.address?.address}
