@@ -1,13 +1,13 @@
 import { authHost, lifeSessionTimeInMin } from "../constants/auth.constants";
 
-async function authService(username, password) {
+async function authService(email, password) {
 
   try {
     const response = await fetch(`${authHost}auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        username,
+        email,
         password,
         expiresInMins: lifeSessionTimeInMin,
       }),

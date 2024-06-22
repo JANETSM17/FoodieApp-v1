@@ -1,29 +1,27 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, Button, View, TouchableOpacity, ViewProps, ActivityIndicator } from "react-native";
-import demoService from '../services/demoService'
-import { User } from '../types/user.type'
+import { StyleSheet, Text, Button, View, ActivityIndicator } from "react-native";
+import demoService from '../services/demoService';
 import useAuth from "../hooks/useAuth";
-
 
 function HomePage() {
     const { logout } = useAuth();
     const [loading, setLoading] = useState(true);
-    const [data,  setData] = useState<User | undefined>(undefined);
+    const [comedores,  setComedores] = useState([]);
 
     useEffect(() => {
-        handleLoad()
-    }, [])
-
-    useEffect(() => {
-        console.log({data})
-
-    }, [data])
+        handleLoad();
+    }, []);
 
     const handleLoad = async () => {
-        setLoading(true)
-        const _data = await demoService()
-        setData(_data)
-        setLoading(false)
+        setLoading(true);
+        try {
+            const data = await demoService();
+            setComedores(data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (loading) {
@@ -34,17 +32,21 @@ function HomePage() {
         );
     }
 
-    if (!data) {
-        // Si no hay datos, navegar a la pantalla de Login
+    if (!comedores || comedores.length === 0) {
         logout();
         return null; // Retornar null porque la navegación ya se maneja
     }
-    
 
     return (
         <View style={styles.mainContainer}>
             <View style={styles.loginContainer}>
-                <Text style={styles.loginTitle}>{data?.address?.address}</Text>
+                {comedores.map((comedor) => (
+                    <View key={comedor._id} style={styles.comedorContainer}>
+                        <Text style={styles.comedorTitle}>{comedor.nombre}</Text>
+                        <Text style={styles.comedorRating}>Calificación: {comedor.calif}</Text>
+                        <Text style={styles.comedorWait}>Tiempo de espera mínimo: {comedor.min_espera} minutos</Text>
+                    </View>
+                ))}
                 <Button title="Cerrar sesión" onPress={logout} />
             </View>
         </View>
@@ -70,47 +72,29 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         elevation: 5,
     },
-    loginInnerContainer: {
-        marginVertical: 10,
-        width: '100%',
-    },
-    loginTitle: {
-        fontSize: 36,
-        fontWeight: 'bold',
-        color: '#333333',
-        textAlign: 'center',
+    comedorContainer: {
         marginBottom: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#CCCCCC',
+        paddingBottom: 10,
     },
-    loginText: {
-        fontSize: 18,
-        color: '#333333',
+    comedorTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
         marginBottom: 5,
     },
-    loginInput: {
-        backgroundColor: '#F8F8F8',
-        borderRadius: 5,
-        padding: 10,
-        borderColor: '#DDDDDD',
-        borderWidth: 1,
-        width: '100%',
+    comedorRating: {
         fontSize: 16,
+        color: '#333333',
+        marginBottom: 3,
     },
-    loginButton: {
-        marginTop: 20,
-        backgroundColor: '#1E90FF',
-        borderRadius: 5,
-        padding: 15,
-        width: '100%',
-        alignItems: 'center',
-    },
-    loginButtonText: {
-        color: '#FFFFFF',
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
+    comedorWait: {
+        fontSize: 16,
+        color: '#333333',
+    }
 });
 
+export default HomePage;
 
-export default HomePage
 
 //{data?.address?.address}

@@ -5,21 +5,20 @@ import useAuth from "../hooks/useAuth";
 
 
 function LoginPage() {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
 
     const { login, loading } = useAuth();
 
     const handleLogin = async () => {
-        await login(username, password);
+        await login(email, password);
     };
 
-
-    if(loading){
+    if (loading) {
         return (
             <View style={styles.mainContainer}>
-                <ActivityIndicator/>
+                <ActivityIndicator size="large" color="#1E90FF" />
             </View>
         );
     }
@@ -29,11 +28,11 @@ function LoginPage() {
             <View style={styles.loginContainer}>
                 <Text style={styles.loginTitle}>Welcome!</Text>
                 <View style={styles.loginInnerContainer}>
-                    <Text style={styles.loginText}>Username</Text>
+                    <Text style={styles.loginText}>Email</Text>
                     <TextInput
                         style={styles.loginInput}
-                        onChangeText={setUsername}
-                        placeholder="Enter username"
+                        onChangeText={setEmail}
+                        placeholder="Enter Email"
                         placeholderTextColor="#A9A9A9"
                     />
                 </View>
