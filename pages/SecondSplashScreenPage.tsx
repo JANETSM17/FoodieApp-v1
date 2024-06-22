@@ -27,8 +27,8 @@ const styles = StyleSheet.create({
     
   },
   customer: {
-    width:80,
-    height:100,
+    width:300,
+    height:400,
   },
   highlight: {
     color: 'orange'
