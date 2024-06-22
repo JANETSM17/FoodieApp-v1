@@ -7,7 +7,8 @@ const SecondSplashScreen = () => {
     return (
       <View style={styles.container}>
       <Image source={require('../assets/images//recursosExtras/costumer.png')} style={styles.customer}/>
-              <Text style={styles.text}> Ordena lo que <Text style={styles.highlight}>quieras</Text> a la hora que <Text style={styles.highlight}>quieras</Text></Text>
+              <Text style={styles.text}> Ordena lo que <Text style={styles.highlight}>quieras</Text></Text>
+              <Text style={styles.text}>a la hora que <Text style={styles.highlight}>quieras</Text></Text>
       </View>
       );
 };
@@ -21,7 +22,7 @@ const styles = StyleSheet.create({
     
   },
   text: {
-    fontSize: 10,
+    fontSize: 20,
     fontWeight: 'bold',
     
   },

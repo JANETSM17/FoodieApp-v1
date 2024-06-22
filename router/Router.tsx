@@ -5,6 +5,8 @@ import AuthStack from "./AuthStack";
 import AppStack from "./AppStack";
 import useAuth from "../hooks/useAuth";
 import FirstSplashScreen from "../pages/FirstSplashScreenPage";
+import HomePage from "../pages/HomePage";
+
 
 function Router() {
   const { user, loading } = useAuth();
@@ -18,10 +20,13 @@ function Router() {
   }
 
   return (
-    <NavigationContainer>
-      {user != undefined ? <AppStack /> : <AuthStack />}
-    </NavigationContainer>
+
+      <NavigationContainer>
+        {user != undefined ? <AppStack /> : <AuthStack />}
+      </NavigationContainer>
+    
   );
+  
 }
 
 const styles = StyleSheet.create({

@@ -22,7 +22,7 @@ const LandingPage = () => {
         ]}
         onPress={handleLoginPress}
       >
-        <Text style={styles.buttonText}>Iniciar Sesión</Text>
+        <Text style={styles.buttonTextW}>Iniciar Sesión</Text>
       </Pressable>
       <Image 
         source={require('../assets/images/recursosExtras/cafeteria.png')} 
@@ -69,6 +69,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  buttonTextW:{
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  }
 });
 
 export default LandingPage;
