@@ -3,19 +3,19 @@ import { StyleSheet, Text, TextInput, View, TouchableOpacity, ActivityIndicator,
 import useAuth from "../hooks/useAuth";
 
 function LoginPage() {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const { login, loading } = useAuth();
 
     const handleLogin = async () => {
-        await login(username, password);
+        await login(email, password);
     };
 
     if (loading) {
         return (
             <View style={styles.mainContainer}>
-                <ActivityIndicator />
+                <ActivityIndicator size="large" color="#1E90FF" />
             </View>
         );
     }
@@ -28,8 +28,8 @@ function LoginPage() {
                     <Text style={styles.loginText}>Correo Electrónico</Text>
                     <TextInput
                         style={styles.loginInput}
-                        onChangeText={setUsername}
-                        placeholder="correo electrónico"
+                        onChangeText={setEmail}
+                        placeholder="Correo electrónico"
                         placeholderTextColor="#A9A9A9"
                     />
                 </View>

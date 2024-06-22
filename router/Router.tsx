@@ -13,8 +13,11 @@ function Router() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <FirstSplashScreen />
+      // <View style={styles.container}>
+      //   <FirstSplashScreen />
+      // </View>
+      <View style={styles.mainContainer}>
+        <ActivityIndicator size="large" color="#1E90FF" />
       </View>
     );
   }
@@ -30,11 +33,12 @@ function Router() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  mainContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#F0F8FF',
+    padding: 20,
   },
 });
 
