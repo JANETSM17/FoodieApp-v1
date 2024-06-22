@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 
 const FirstSplashScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}> Foodie </Text>
+      <Image source={require('../assets/images/logos/FoodieLogo.png')}/>
     </View>
   );
 };
@@ -14,12 +14,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: 'black',
     
   },
   text: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: 'white',
     
   },
 });

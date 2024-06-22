@@ -1,13 +1,10 @@
 import { useState } from "react";
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, ViewProps, ActivityIndicator } from "react-native";
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, ActivityIndicator, Image } from "react-native";
 import useAuth from "../hooks/useAuth";
-
-
 
 function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
 
     const { login, loading } = useAuth();
 
@@ -25,31 +22,31 @@ function LoginPage() {
 
     return (
         <View style={styles.mainContainer}>
-            <View style={styles.loginContainer}>
-                <Text style={styles.loginTitle}>Welcome!</Text>
-                <View style={styles.loginInnerContainer}>
-                    <Text style={styles.loginText}>Email</Text>
+            <Image source={require('../assets/images/logos/FoodieNegro.png')} style={styles.fBlack} />
+            <View>
+                <View>
+                    <Text style={styles.loginText}>Correo Electrónico</Text>
                     <TextInput
                         style={styles.loginInput}
                         onChangeText={setEmail}
-                        placeholder="Enter Email"
+                        placeholder="Correo electrónico"
                         placeholderTextColor="#A9A9A9"
                     />
                 </View>
-                <View style={styles.loginInnerContainer}>
-                    <Text style={styles.loginText}>Password</Text>
+                <View>
+                    <Text style={styles.loginText}>Contraseña</Text>
                     <TextInput
                         style={styles.loginInput}
                         onChangeText={setPassword}
                         secureTextEntry={true}
-                        placeholder="Enter password"
+                        placeholder="contraseña"
                         placeholderTextColor="#A9A9A9"
                     />
                 </View>
-               <TouchableOpacity onPress={handleLogin} style={styles.loginButton}>
-                    <Text style={styles.loginButtonText}>Login</Text>
-                </TouchableOpacity> 
-            </View>
+                <TouchableOpacity onPress={handleLogin} style={styles.loginButton}>
+                    <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+                </TouchableOpacity>
+                </View>
         </View>
     );
 }
@@ -59,59 +56,56 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#F0F8FF',
+        backgroundColor: 'white',
         padding: 20,
     },
     loginContainer: {
         backgroundColor: '#FFFFFF',
         padding: 20,
-        width: 300,
+        width: '90%',
+        maxWidth: 400,
         borderRadius: 10,
         shadowColor: '#000',
         shadowOpacity: 0.2,
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 2 },
         elevation: 5,
-    },
-    loginInnerContainer: {
-        marginVertical: 10,
-        width: '100%',
-    },
-    loginTitle: {
-        fontSize: 36,
-        fontWeight: 'bold',
-        color: '#333333',
-        textAlign: 'center',
-        marginBottom: 20,
+        alignItems: 'center', 
     },
     loginText: {
-        fontSize: 18,
+        fontSize: 16,
         color: '#333333',
         marginBottom: 5,
+        padding: 10,
+        margin: 5,
     },
     loginInput: {
-        backgroundColor: '#F8F8F8',
-        borderRadius: 5,
+        backgroundColor: 'white',
+        borderRadius: 25, 
         padding: 10,
-        borderColor: '#DDDDDD',
+        borderColor: 'orange',
         borderWidth: 1,
         width: '100%',
         fontSize: 16,
     },
     loginButton: {
         marginTop: 20,
-        backgroundColor: '#1E90FF',
-        borderRadius: 5,
+        backgroundColor: 'black',
+        borderRadius: 25, 
         padding: 15,
         width: '100%',
         alignItems: 'center',
     },
     loginButtonText: {
         color: '#FFFFFF',
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
     },
+    fBlack: {
+        width: 100,
+        height: 25,
+        marginBottom: 20, 
+    }
 });
 
-
-export default LoginPage
+export default LoginPage;
