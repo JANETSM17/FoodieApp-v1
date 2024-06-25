@@ -5,7 +5,16 @@ const UserProfile = () => {
   return (
     <View>
       <Image source={require('../assets/images/fotosCliente/FoxClient.jpeg')} style={styles.customer}/>
-      <Text style={styles.UserName}>UserProfile</Text>
+      <Text style={styles.UserName}>UserFullName</Text>
+      <Text style={styles.UserName}>UserName</Text>
+
+      <Text style={styles.UserName}>UserEmail</Text>
+      <Text style={styles.UserName}>UserTelephone</Text>
+      <Text style={styles.UserName}>Te uniste el: </Text>
+      <Text style={styles.UserName}>Total gastado: </Text>
+
+      <Text style={styles.UserName}>Pedido pendiente en: </Text>
+      <Text style={styles.UserName}>Historial de pedidos</Text>
     </View>
   )
 }

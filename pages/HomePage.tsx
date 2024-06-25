@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
-import { StyleSheet, Text, Button, View, ActivityIndicator, Image, TouchableOpacity } from "react-native";
+// HomePage.js
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View, ActivityIndicator, Image, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import demoService from '../services/demoService';
 import useAuth from "../hooks/useAuth";
 
@@ -7,6 +9,7 @@ function HomePage() {
     const { logout } = useAuth();
     const [loading, setLoading] = useState(true);
     const [comedores, setComedores] = useState([]);
+    const navigation = useNavigation(); // Obtiene el objeto de navegación
 
     useEffect(() => {
         handleLoad();
@@ -22,6 +25,10 @@ function HomePage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleRestaurantPress = (comedor) => {
+        navigation.navigate('DiningRoomScreen', { comedor }); // Navega hacia DiningRoomScreen con los datos del comedor
     };
 
     if (loading) {
@@ -47,7 +54,11 @@ function HomePage() {
             </TouchableOpacity>
             <View style={styles.contentContainer}>
                 {comedores.map((comedor) => (
-                    <View key={comedor._id} style={styles.comedorContainer}>
+                    <TouchableOpacity
+                        key={comedor._id}
+                        style={styles.comedorContainer}
+                        onPress={() => handleRestaurantPress(comedor)} // Maneja la navegación al hacer clic
+                    >
                         <Text style={styles.comedorTitle}>{comedor.nombre}</Text>
                         <Text style={styles.comedorRating}>
                             Calificación: 
@@ -57,7 +68,7 @@ function HomePage() {
                             Tiempo de espera mínimo: 
                             <Text style={styles.boldText}> {comedor.min_espera} minutos</Text>
                         </Text>
-                    </View>
+                    </TouchableOpacity>
                 ))}
                 <TouchableOpacity style={styles.roundButton} onPress={logout}>
                     <Text style={styles.buttonText}>Cerrar sesión</Text>
@@ -105,7 +116,7 @@ const styles = StyleSheet.create({
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 2 },
         elevation: 5,
-        width: '100%', // 
+        width: '100%', 
         alignItems: 'center', 
     },
     comedorTitle: {
