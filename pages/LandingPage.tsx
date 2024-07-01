@@ -2,11 +2,16 @@ import React from 'react';
 import { View, Image, Text, Pressable, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+
 const LandingPage = () => {
   const navigation = useNavigation(); // Obtiene el objeto de navegación
 
   const handleLoginPress = () => {
     navigation.navigate('Login'); // Navega hacia la pantalla de login al presionar el botón
+  };
+
+  const handleRegisterPress = () => {
+    navigation.navigate('Bolsa'); // Navega hacia la pantalla de login al presionar el botón
   };
 
   return (
@@ -33,7 +38,7 @@ const LandingPage = () => {
           styles.button,
           pressed && styles.buttonPressed
         ]}
-        onPress={() => console.log('Registrarse presionado')}
+        onPress={handleRegisterPress} 
       >
         <Text style={styles.buttonText}>Registrarse</Text>
       </Pressable>
