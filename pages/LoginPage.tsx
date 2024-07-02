@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, ActivityIndicator, Image } from "react-native";
+import { Ionicons } from '@expo/vector-icons'; // Asegúrate de tener instalado @expo/vector-icons
+import { useNavigation } from '@react-navigation/native';
 import useAuth from "../hooks/useAuth";
 
 function LoginPage() {
@@ -7,6 +9,7 @@ function LoginPage() {
     const [password, setPassword] = useState('');
 
     const { login, loading } = useAuth();
+    const navigation = useNavigation();
 
     const handleLogin = async () => {
         await login(email, password);
@@ -22,6 +25,9 @@ function LoginPage() {
 
     return (
         <View style={styles.mainContainer}>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <Ionicons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
             <Image source={require('../assets/images/logos/FoodieNegro.png')} style={styles.fBlack} />
             <View>
                 <View>
@@ -46,7 +52,7 @@ function LoginPage() {
                 <TouchableOpacity onPress={handleLogin} style={styles.loginButton}>
                     <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
                 </TouchableOpacity>
-                </View>
+            </View>
         </View>
     );
 }
@@ -59,18 +65,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         padding: 20,
     },
-    loginContainer: {
-        backgroundColor: '#FFFFFF',
-        padding: 20,
-        width: '90%',
-        maxWidth: 400,
-        borderRadius: 10,
-        shadowColor: '#000',
-        shadowOpacity: 0.2,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 5,
-        alignItems: 'center', 
+    backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 20,
     },
     loginText: {
         fontSize: 16,
@@ -81,7 +79,7 @@ const styles = StyleSheet.create({
     },
     loginInput: {
         backgroundColor: 'white',
-        borderRadius: 25, 
+        borderRadius: 25,
         padding: 10,
         borderColor: 'orange',
         borderWidth: 1,
@@ -91,7 +89,7 @@ const styles = StyleSheet.create({
     loginButton: {
         marginTop: 20,
         backgroundColor: 'black',
-        borderRadius: 25, 
+        borderRadius: 25,
         padding: 15,
         width: '100%',
         alignItems: 'center',
@@ -104,8 +102,8 @@ const styles = StyleSheet.create({
     fBlack: {
         width: 100,
         height: 25,
-        marginBottom: 20, 
-    }
+        marginBottom: 20,
+    },
 });
 
 export default LoginPage;
