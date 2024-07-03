@@ -8,7 +8,7 @@ const slides = [
   {
     id: '1',
     title: 'Encuentra tu comida favorita cerca de ti',
-    description: 'Inicia Sesión para comenzar.',
+    description: 'Inicia sesión para comenzar.',
     image: require('../assets/images/logos/cubiertos.png'), 
     buttons: [
       { text: 'Iniciar Sesión', onPress: 'Login' },
@@ -20,7 +20,7 @@ const slides = [
     description: 'Regístrate aquí.',
     image: require('../assets/images/recursosExtras/camino.png'), 
     buttons: [
-      { text: 'Usuario', onPress: 'Register', userType: 'Usuario' },
+      { text: 'Cliente', onPress: 'Register', userType: 'Usuario' },
       { text: 'Proveedor', onPress: 'Register', userType: 'Proveedor' },
     ],
   },

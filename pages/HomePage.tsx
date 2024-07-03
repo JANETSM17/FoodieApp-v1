@@ -1,4 +1,3 @@
-// HomePage.js
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, ActivityIndicator, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -29,6 +28,7 @@ function HomePage() {
 
     const handleRestaurantPress = (comedor) => {
         navigation.navigate('DiningRoomScreen', { comedor }); // Navega hacia DiningRoomScreen con los datos del comedor
+        console.log(comedor);
     };
 
     if (loading) {

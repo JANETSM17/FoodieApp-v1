@@ -1,13 +1,70 @@
-import React from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Image, CheckBox } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Image} from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Asegúrate de tener instalado @expo/vector-icons
+import { authHost } from "../constants/auth.constants";
 
 const Register = ({ route, navigation }) => {
   const { userType } = route.params;
+  const [formData, setFormData] = useState({
+    nombre: '',
+    apellido: '',
+    correo: '',
+    contraseña: '',
+    confirm_password: '',
+    telefono: '',
+    nombre_empresa: '',
+    rfc: '',
+    direccion_comercial: '',
+    regimen_fiscal: '',
+    correo_corporativo: ''
+  });
 
-  const handleRegister = () => {
-    // Implementa la lógica de registro aquí
-    alert(`Registrado como ${userType}`);
+
+  const handleInputChange = (name, value) => {
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleRegister = async () => {
+    const payload = userType === 'Usuario' ? {
+      nombre: formData.nombre,
+      apellido: formData.apellido,
+      correo: formData.correo,
+      contraseña: formData.contraseña,
+      confirm_password: formData.confirm_password,
+      telefono: formData.telefono,
+      userType
+    } : {
+      nombre_empresa: formData.nombre_empresa,
+      correo_corporativo: formData.correo_corporativo,
+      contraseña: formData.contraseña,
+      confirm_password: formData.confirm_password,
+      telefono: formData.telefono,
+      rfc: formData.rfc,
+      direccion_comercial: formData.direccion_comercial,
+      regimen_fiscal: formData.regimen_fiscal,
+      userType
+    };
+
+    try {
+      const response = await fetch(`${authHost}auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.status === 201) {
+        console.log('Éxito', 'Usuario registrado con éxito');
+        navigation.navigate('Login'); // Redirige al login después de registrarse
+      } else {
+        console.log('Error', data.message || 'Error al registrar el usuario');
+      }
+    } catch (error) {
+      console.log('Error', 'No se pudo conectar con el servidor');
+    }
   };
 
   return (
@@ -22,29 +79,35 @@ const Register = ({ route, navigation }) => {
             <TextInput
               style={[styles.input, styles.halfInput]}
               placeholder="Nombre"
+              onChangeText={(text) => handleInputChange('nombre', text)}
             />
             <TextInput
               style={[styles.input, styles.halfInput]}
               placeholder="Apellido"
+              onChangeText={(text) => handleInputChange('apellido', text)}
             />
           </View>
           <TextInput
             style={styles.input}
             placeholder="Correo Electrónico"
+            onChangeText={(text) => handleInputChange('correo', text)}
           />
           <TextInput
             style={styles.input}
             placeholder="Contraseña"
             secureTextEntry
+            onChangeText={(text) => handleInputChange('contraseña', text)}
           />
           <TextInput
             style={styles.input}
             placeholder="Confirmar contraseña"
             secureTextEntry
+            onChangeText={(text) => handleInputChange('confirm_password', text)}
           />
           <TextInput
             style={styles.input}
             placeholder="Número de teléfono"
+            onChangeText={(text) => handleInputChange('telefono', text)}
           />
         </>
       ) : (
@@ -52,45 +115,53 @@ const Register = ({ route, navigation }) => {
           <TextInput
             style={styles.input}
             placeholder="Nombre de la empresa"
+            onChangeText={(text) => handleInputChange('nombre_empresa', text)}
           />
           <TextInput
             style={styles.input}
             placeholder="Número telefónico"
+            onChangeText={(text) => handleInputChange('telefono', text)}
           />
           <TextInput
             style={styles.input}
             placeholder="RFC"
+            onChangeText={(text) => handleInputChange('rfc', text)}
           />
           <TextInput
             style={styles.input}
             placeholder="Dirección comercial"
+            onChangeText={(text) => handleInputChange('direccion_comercial', text)}
           />
           <TextInput
             style={styles.input}
             placeholder="Régimen fiscal"
+            onChangeText={(text) => handleInputChange('regimen_fiscal', text)}
           />
           <TextInput
             style={styles.input}
             placeholder="Correo electrónico corporativo"
+            onChangeText={(text) => handleInputChange('correo_corporativo', text)}
           />
           <TextInput
             style={styles.input}
             placeholder="Contraseña"
             secureTextEntry
+            onChangeText={(text) => handleInputChange('contraseña', text)}
           />
           <TextInput
             style={styles.input}
             placeholder="Confirmar contraseña"
             secureTextEntry
+            onChangeText={(text) => handleInputChange('confirm_password', text)}
           />
-          <View style={styles.checkboxContainer}>
+          {/* <View style={styles.checkboxContainer}>
             <CheckBox />
             <Text style={styles.checkboxLabel}>Acepto y he leído los términos y condiciones</Text>
           </View>
           <View style={styles.checkboxContainer}>
             <CheckBox />
             <Text style={styles.checkboxLabel}>Acepto y he leído la Política de privacidad</Text>
-          </View>
+          </View> */}
         </>
       )}
       <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
