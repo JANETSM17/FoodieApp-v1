@@ -1,9 +1,12 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import React, { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons'; // Asegúrate de tener instalado @expo/vector-icons
+import { useNavigation } from '@react-navigation/native';
 
 const RestaurantScreen = () => {
   const [selectedMenu, setSelectedMenu] = useState('Comida');
   const [cart, setCart] = useState([]);
+  const navigation = useNavigation();
 
   const menuItems = {
     Comida: [
@@ -41,10 +44,10 @@ const RestaurantScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
-          <Text style={styles.backButtonText}>&lt;</Text>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.title}>Foodie</Text>
+        <Image source={require('../assets/images/logos/FoodieNegro.png')} style={styles.fBlack} />
       </View>
       <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.restaurantImage} />
       <Text style={styles.restaurantName}>Cafeteria BIS</Text>
@@ -83,7 +86,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 10,
+    padding: 20,
   },
   header: {
     flexDirection: 'row',
@@ -168,4 +171,10 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
   },
+  fBlack: {
+    width: 100,
+    height: 25,
+    marginBottom: 20,
+    marginTop: 25,
+},
 });

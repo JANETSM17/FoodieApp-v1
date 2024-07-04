@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; // Asegúrate de tener instalado @expo/vector-icons
+import { useNavigation } from '@react-navigation/native';
 
 const UserProfile = () => {
   const [selectedTab, setSelectedTab] = useState('Información');
+  const navigation = useNavigation();
 
   return (
     <View style={styles.mainContainer}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
-          <Text style={styles.backButtonText}>{'<'}</Text>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.title}>Foodie</Text>
+        <Image source={require('../assets/images/logos/FoodieNegro.png')} style={styles.fBlack} />
       </View>
 
       <View style={styles.profileContainer}>
@@ -83,7 +86,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: 'white',
-    padding: 20,
+    padding: 25,
   },
   header: {
     flexDirection: 'row',
@@ -190,6 +193,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  fBlack: {
+    width: 100,
+    height: 25,
+    marginBottom: 20,
+    marginTop: 25,
+},
 });
 
 export default UserProfile;

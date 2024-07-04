@@ -19,7 +19,7 @@ function AuthStack() {
       }, 2000); // Mostrar la primera splash screen durante 2 segundos
     } else if (currentScreen === 'SecondSplash') {
       setTimeout(() => {
-        setCurrentScreen('Home');
+        setCurrentScreen('Landing');
       }, 2000); // Mostrar la segunda splash screen durante 2 segundos
     }
   }, [currentScreen]);

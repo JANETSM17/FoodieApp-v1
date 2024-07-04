@@ -26,9 +26,12 @@ function HomePage() {
         }
     };
 
-    const handleRestaurantPress = (comedor) => {
-        navigation.navigate('DiningRoomScreen', { comedor }); // Navega hacia DiningRoomScreen con los datos del comedor
-        console.log(comedor);
+    const handleRestaurantPress = () => {
+        navigation.navigate('RestaurantScreen'); // Navega hacia DiningRoomScreen con los datos del comedor
+    };
+
+    const handleProfilePress = () => {
+        navigation.navigate('RestaurantProfile'); // Navega hacia DiningRoomScreen con los datos del comedor
     };
 
     if (loading) {
@@ -72,6 +75,9 @@ function HomePage() {
                 ))}
                 <TouchableOpacity style={styles.roundButton} onPress={logout}>
                     <Text style={styles.buttonText}>Cerrar sesión</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.roundButton} onPress={handleProfilePress}>
+                    <Text style={styles.buttonText}>Perfil</Text>
                 </TouchableOpacity>
             </View>
         </View>

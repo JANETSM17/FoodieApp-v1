@@ -1,19 +1,22 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import React, { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons'; // Asegúrate de tener instalado @expo/vector-icons
+import { useNavigation } from '@react-navigation/native';
 
 const RestaurantProfile = () => {
   const [selectedTab, setSelectedTab] = useState('Información');
   const [isToggleOn, setIsToggleOn] = useState(true);
+  const navigation = useNavigation();
 
   const handleToggleChange = () => setIsToggleOn(previousState => !previousState);
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
-          <Text style={styles.backButtonText}>&lt;</Text>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.title}>Foodie</Text>
+        <Image source={require('../assets/images/logos/FoodieNegro.png')} style={styles.fBlack} />
       </View>
       
       <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.restaurantImage} />
@@ -141,7 +144,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 10,
+    padding: 25,
   },
   header: {
     flexDirection: 'row',
@@ -348,4 +351,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
+  fBlack: {
+    width: 100,
+    height: 25,
+    marginBottom: 20,
+    marginTop: 25,
+},
 });
