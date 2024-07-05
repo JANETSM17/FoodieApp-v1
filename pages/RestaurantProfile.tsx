@@ -2,11 +2,13 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Switch } f
 import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons'; // Asegúrate de tener instalado @expo/vector-icons
 import { useNavigation } from '@react-navigation/native';
+import useAuth from '../hooks/useAuth'; // Importa useAuth
 
 const RestaurantProfile = () => {
   const [selectedTab, setSelectedTab] = useState('Información');
   const [isToggleOn, setIsToggleOn] = useState(true);
   const navigation = useNavigation();
+  const { logout } = useAuth(); // Obtiene la función logout de useAuth
 
   const handleToggleChange = () => setIsToggleOn(previousState => !previousState);
 
@@ -14,7 +16,7 @@ const RestaurantProfile = () => {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="black" />
+          <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
         <Image source={require('../assets/images/logos/FoodieNegro.png')} style={styles.fBlack} />
       </View>
@@ -69,7 +71,7 @@ const RestaurantProfile = () => {
           <TouchableOpacity style={styles.actionButton}>
             <Text style={styles.actionButtonText}>Eliminar cuenta</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity style={styles.actionButton} onPress={logout}> {/* Agrega onPress para logout */}
             <Text style={styles.actionButtonText}>Cerrar Sesión</Text>
           </TouchableOpacity>
         </View>
@@ -356,5 +358,6 @@ const styles = StyleSheet.create({
     height: 25,
     marginBottom: 20,
     marginTop: 25,
-},
+  },
 });
+

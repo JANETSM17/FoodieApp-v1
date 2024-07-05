@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Asegúrate de tener instalado @expo/vector-icons
 import { useNavigation } from '@react-navigation/native';
+import useAuth from '../hooks/useAuth'; // Importa useAuth
 
 const UserProfile = () => {
   const [selectedTab, setSelectedTab] = useState('Información');
   const navigation = useNavigation();
+  const { logout } = useAuth(); // Obtiene la función logout de useAuth
 
   return (
-    <View style={styles.mainContainer}>
+    <ScrollView style={styles.mainContainer}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="black" />
@@ -36,15 +38,29 @@ const UserProfile = () => {
           <Text style={[styles.tabText, selectedTab === 'Pedidos' && styles.activeTabText]}>Pedidos</Text>
         </TouchableOpacity>
       </View>
+      
       {selectedTab === 'Información' ? (
         <View style={styles.detailsContainer}>
           <Text style={styles.detailText}>laurabl@gmail.com</Text>
           <Text style={styles.detailText}>614-123-2345</Text>
           <Text style={styles.detailText}>Te uniste el: <Text style={styles.orangeText}>1/Mayo/2024</Text></Text>
           <Text style={styles.detailText}>Total gastado: <Text style={styles.orangeText}>$368</Text></Text>
+
+          {/* Botones adicionales */}
+          <TouchableOpacity style={styles.editButton}>
+            <Text style={styles.editButtonText}>Editar Información</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton}>
+            <Text style={styles.actionButtonText}>Cambiar contraseña</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton}>
+            <Text style={styles.actionButtonText}>Eliminar cuenta</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionButton} onPress={logout}>
+            <Text style={styles.actionButtonText}>Cerrar Sesión</Text>
+          </TouchableOpacity>
         </View>
       ) : (
-
         <ScrollView style={styles.ordersContainer}>
           <View style={styles.orderSection}>
             <Text style={styles.sectionTitle}>Pedido pendiente en:</Text>
@@ -74,11 +90,9 @@ const UserProfile = () => {
               </View>
             </View>
           </View>
-
         </ScrollView>
       )}
-      
-    </View>
+    </ScrollView>
   );
 };
 
@@ -198,7 +212,31 @@ const styles = StyleSheet.create({
     height: 25,
     marginBottom: 20,
     marginTop: 25,
-},
+  },
+  editButton: {
+    backgroundColor: '#000',
+    padding: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  editButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  actionButton: {
+    backgroundColor: '#ffc107',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  actionButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
 });
 
 export default UserProfile;
