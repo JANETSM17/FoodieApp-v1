@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons'; // Asegúrate de tener instalado @expo/vector-icons
 import { useNavigation } from '@react-navigation/native';
 import useAuth from '../hooks/useAuth'; // Importa useAuth
+import Header2 from '../components/Header2'; // Importa Header2
 
 const RestaurantProfile = () => {
   const [selectedTab, setSelectedTab] = useState('Información');
@@ -14,12 +15,7 @@ const RestaurantProfile = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
-        <Image source={require('../assets/images/logos/FoodieNegro.png')} style={styles.fBlack} />
-      </View>
+      <Header2 /> {/* Usa Header2 aquí */}
       
       <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.restaurantImage} />
       <Text style={styles.restaurantName}>Wendys</Text>
@@ -360,4 +356,3 @@ const styles = StyleSheet.create({
     marginTop: 25,
   },
 });
-

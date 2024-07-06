@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, ActivityIndicator, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, ScrollView, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import demoService from '../services/demoService';
 import useAuth from "../hooks/useAuth";
+import Header from "../components/Header"; // Importa el componente Header
 
 function HomePage() {
     const { logout } = useAuth();
@@ -31,7 +32,7 @@ function HomePage() {
     };
 
     const handleProfilePress = () => {
-        navigation.navigate('RestaurantProfile'); // Navega hacia DiningRoomScreen con los datos del comedor
+        navigation.navigate('HomeRestaurant'); // Navega hacia DiningRoomScreen con los datos del comedor
     };
 
     if (loading) {
@@ -49,28 +50,23 @@ function HomePage() {
 
     return (
         <View style={styles.mainContainer}>
-            <View style={styles.topBar}>
-                <Image source={require('../assets/images/logos/FoodieOriginal.png')} style={styles.logo} />
-            </View>
-            <TouchableOpacity style={styles.comedoresBtn}>
-                <Text style={styles.buttonText}>Comedores</Text>
-            </TouchableOpacity>
-            <View style={styles.contentContainer}>
+            <Header /> {/* Implementa el componente Header */}
+            <ScrollView style={styles.contentContainer}>
                 {comedores.map((comedor) => (
                     <TouchableOpacity
                         key={comedor._id}
                         style={styles.comedorContainer}
                         onPress={() => handleRestaurantPress(comedor)} // Maneja la navegación al hacer clic
                     >
+                        <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.comedorImage} />
                         <Text style={styles.comedorTitle}>{comedor.nombre}</Text>
                         <Text style={styles.comedorRating}>
-                            Calificación: 
-                            <Text style={styles.boldText}> {comedor.calif}</Text>
+                            {comedor.calif} <Image source={require('../assets/images/recursosExtras/estrella.png')} style={styles.starIcon} />
                         </Text>
                         <Text style={styles.comedorWait}>
-                            Tiempo de espera mínimo: 
-                            <Text style={styles.boldText}> {comedor.min_espera} minutos</Text>
+                            <Image source={require('../assets/images/recursosExtras/reloj.png')} style={styles.clockIcon} /> {comedor.min_espera} min.
                         </Text>
+                        <Text style={styles.comedorCode}>{comedor.codigo}</Text>
                     </TouchableOpacity>
                 ))}
                 <TouchableOpacity style={styles.roundButton} onPress={logout}>
@@ -79,7 +75,7 @@ function HomePage() {
                 <TouchableOpacity style={styles.roundButton} onPress={handleProfilePress}>
                     <Text style={styles.buttonText}>Perfil</Text>
                 </TouchableOpacity>
-            </View>
+            </ScrollView>
         </View>
     );
 }
@@ -87,75 +83,66 @@ function HomePage() {
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        backgroundColor: '#F0F0F0', 
-    },
-    topBar: {
-        height: 80,
-        width: '100%',
-        backgroundColor: 'black',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingTop: 20, 
-        paddingBottom: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#CCCCCC',
-    },
-    logo: {
-        width: 180, 
-        height: 45, 
+        backgroundColor: '#f0f0f0', 
     },
     contentContainer: {
         flex: 1,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        padding: 20,
+        padding: 10,
     },
     comedorContainer: {
         backgroundColor: '#FFFFFF',
-        borderColor: 'black', 
+        borderColor: '#ddd', 
         borderWidth: 1, 
         padding: 20,
         marginBottom: 20,
         borderRadius: 20, 
         shadowColor: '#000',
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.1,
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 2 },
         elevation: 5,
-        width: '100%', 
         alignItems: 'center', 
     },
+    comedorImage: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        marginBottom: 10,
+    },
     comedorTitle: {
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 5,
-        color: 'orange',
+        color: '#333',
         textAlign: 'center', 
     },
     comedorRating: {
         fontSize: 16,
-        color: 'black',
-        marginBottom: 3,
-        textAlign: 'left', 
+        color: '#FFA500',
+        marginBottom: 5,
+        textAlign: 'center', 
+    },
+    starIcon: {
+        width: 16,
+        height: 16,
     },
     comedorWait: {
-        fontSize: 16,
-        color: 'black',
-        textAlign: 'left', 
+        fontSize: 14,
+        color: '#555',
+        marginBottom: 5,
+        textAlign: 'center', 
     },
-    boldText: {
-        fontWeight: 'bold', 
+    clockIcon: {
+        width: 16,
+        height: 16,
+    },
+    comedorCode: {
+        fontSize: 14,
+        color: '#999',
+        textAlign: 'center',
     },
     roundButton: {
-        backgroundColor: 'black', 
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 50, 
-        alignItems: 'center',
-        margin: 20,
-    },
-    comedoresBtn: {
-        backgroundColor: 'orange',
+        backgroundColor: '#000', 
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 50, 
