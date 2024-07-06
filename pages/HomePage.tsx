@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, ActivityIndicator, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import demoService from '../services/demoService';
+import { getUserInfo, getComedores } from '../services/demoService';
 import useAuth from "../hooks/useAuth";
 
 function HomePage() {
     const { logout } = useAuth();
     const [loading, setLoading] = useState(true);
     const [comedores, setComedores] = useState([]);
-    const navigation = useNavigation(); // Obtiene el objeto de navegación
+    const [cliente, setCliente] = useState(null);
+    const navigation = useNavigation();
 
     useEffect(() => {
         handleLoad();
@@ -17,8 +18,15 @@ function HomePage() {
     const handleLoad = async () => {
         setLoading(true);
         try {
-            const data = await demoService();
-            setComedores(data);
+            const clientInfo = await getUserInfo();
+            if (!clientInfo) {
+                logout();
+                return;
+            }
+            setCliente(clientInfo);
+
+            const comedoresData = await getComedores();
+            setComedores(comedoresData);
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
@@ -27,11 +35,12 @@ function HomePage() {
     };
 
     const handleRestaurantPress = () => {
-        navigation.navigate('RestaurantScreen'); // Navega hacia DiningRoomScreen con los datos del comedor
+        navigation.navigate('Menu');
     };
 
     const handleProfilePress = () => {
-        navigation.navigate('RestaurantProfile'); // Navega hacia DiningRoomScreen con los datos del comedor
+        navigation.navigate('RestaurantProfile');
+        console.log("si llega a bag");
     };
 
     if (loading) {
@@ -42,9 +51,9 @@ function HomePage() {
         );
     }
 
-    if (!comedores || comedores.length === 0) {
+    if (!cliente) {
         logout();
-        return null; // Retornar null porque la navegación ya se maneja
+        return null;
     }
 
     return (
@@ -56,28 +65,32 @@ function HomePage() {
                 <Text style={styles.buttonText}>Comedores</Text>
             </TouchableOpacity>
             <View style={styles.contentContainer}>
-                {comedores.map((comedor) => (
-                    <TouchableOpacity
-                        key={comedor._id}
-                        style={styles.comedorContainer}
-                        onPress={() => handleRestaurantPress(comedor)} // Maneja la navegación al hacer clic
-                    >
-                        <Text style={styles.comedorTitle}>{comedor.nombre}</Text>
-                        <Text style={styles.comedorRating}>
-                            Calificación: 
-                            <Text style={styles.boldText}> {comedor.calif}</Text>
-                        </Text>
-                        <Text style={styles.comedorWait}>
-                            Tiempo de espera mínimo: 
-                            <Text style={styles.boldText}> {comedor.min_espera} minutos</Text>
-                        </Text>
-                    </TouchableOpacity>
-                ))}
+                {comedores.length === 0 ? (
+                    <View style={styles.noComedoresContainer}>
+                        <Text>No tienes ningún comedor guardado</Text>
+                    </View>
+                ) : (
+                    comedores.map((comedor) => (
+                        <TouchableOpacity
+                            key={comedor._id}
+                            style={styles.comedorContainer}
+                            onPress={() => handleRestaurantPress()}
+                        >
+                            <Text style={styles.comedorTitle}>{comedor.nombre}</Text>
+                            <Text style={styles.comedorRating}>
+                                Calificación: <Text style={styles.boldText}>{comedor.calif}</Text>
+                            </Text>
+                            <Text style={styles.comedorWait}>
+                                Tiempo de espera mínimo: <Text style={styles.boldText}>{comedor.min_espera} minutos</Text>
+                            </Text>
+                        </TouchableOpacity>
+                    ))
+                )}
                 <TouchableOpacity style={styles.roundButton} onPress={logout}>
                     <Text style={styles.buttonText}>Cerrar sesión</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.roundButton} onPress={handleProfilePress}>
-                    <Text style={styles.buttonText}>Perfil</Text>
+                    <Text style={styles.buttonText}>Profile</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -87,7 +100,7 @@ function HomePage() {
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        backgroundColor: '#F0F0F0', 
+        backgroundColor: '#F0F0F0',
     },
     topBar: {
         height: 80,
@@ -95,14 +108,14 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: 20, 
+        paddingTop: 20,
         paddingBottom: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#CCCCCC',
     },
     logo: {
-        width: 180, 
-        height: 45, 
+        width: 180,
+        height: 45,
     },
     contentContainer: {
         flex: 1,
@@ -112,45 +125,45 @@ const styles = StyleSheet.create({
     },
     comedorContainer: {
         backgroundColor: '#FFFFFF',
-        borderColor: 'black', 
-        borderWidth: 1, 
+        borderColor: 'black',
+        borderWidth: 1,
         padding: 20,
         marginBottom: 20,
-        borderRadius: 20, 
+        borderRadius: 20,
         shadowColor: '#000',
         shadowOpacity: 0.2,
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 2 },
         elevation: 5,
-        width: '100%', 
-        alignItems: 'center', 
+        width: '100%',
+        alignItems: 'center',
     },
     comedorTitle: {
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 5,
         color: 'orange',
-        textAlign: 'center', 
+        textAlign: 'center',
     },
     comedorRating: {
         fontSize: 16,
         color: 'black',
         marginBottom: 3,
-        textAlign: 'left', 
+        textAlign: 'left',
     },
     comedorWait: {
         fontSize: 16,
         color: 'black',
-        textAlign: 'left', 
+        textAlign: 'left',
     },
     boldText: {
-        fontWeight: 'bold', 
+        fontWeight: 'bold',
     },
     roundButton: {
-        backgroundColor: 'black', 
+        backgroundColor: 'black',
         paddingVertical: 10,
         paddingHorizontal: 20,
-        borderRadius: 50, 
+        borderRadius: 50,
         alignItems: 'center',
         margin: 20,
     },
@@ -158,7 +171,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'orange',
         paddingVertical: 10,
         paddingHorizontal: 20,
-        borderRadius: 50, 
+        borderRadius: 50,
         alignItems: 'center',
         margin: 20,
     },
@@ -166,6 +179,21 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    noComedoresContainer: {
+        backgroundColor: '#FFFFFF',
+        borderColor: 'black',
+        borderWidth: 1,
+        padding: 20,
+        marginBottom: 20,
+        borderRadius: 20,
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 5,
+        width: '100%',
+        alignItems: 'center',
     },
 });
 

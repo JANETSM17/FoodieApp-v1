@@ -1,37 +1,65 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authHost } from "../constants/auth.constants";
 
-async function demoService() {
-
+async function getUserInfo() {
   try {
     const authDataSerialize = await AsyncStorage.getItem('@authData');
 
-    if(!authDataSerialize){
-      throw new Error("Not auth data storage")  
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
     }
-    
-    const { token } = JSON.parse(authDataSerialize)
-      
+
+    const { token } = JSON.parse(authDataSerialize);
+
     const response = await fetch(`${authHost}auth/me`, {
       method: "GET",
       headers: { 
         "Content-Type": "application/json", 
         'Authorization': `Bearer ${token}`
       },
-     
     });
-  
-    if(!response.ok){
+
+    if (!response.ok) {
       await response.json();
       throw new Error(response.message);
     }
-  
+
     return response.json();
   } catch (error) {
-    alert("Error in login")
-
+    alert("Error fetching client info");
     return undefined;
   }
 }
 
-export default demoService;
+async function getComedores() {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}comedores`, {
+      method: "GET",
+      headers: { 
+        "Content-Type": "application/json", 
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      await response.json();
+      throw new Error(response.message);
+    }
+
+    return response.json();
+  } catch (error) {
+    alert("Error fetching comedores");
+    return [];
+  }
+}
+
+export { getUserInfo, getComedores };
+

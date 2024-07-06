@@ -25,7 +25,7 @@ function LoginPage() {
 
     return (
         <View style={styles.mainContainer}>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Landing')}>
                 <Ionicons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
             <Image source={require('../assets/images/logos/FoodieNegro.png')} style={styles.fBlack} />
