@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, ActivityIndicator, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, ScrollView, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { getUserInfo, getComedores } from '../services/demoService';
 import useAuth from "../hooks/useAuth";
+import Header from "../components/Header"; // Importa el componente Header
 
 function HomePage() {
     const { logout } = useAuth();
@@ -92,7 +93,7 @@ function HomePage() {
                 <TouchableOpacity style={styles.roundButton} onPress={handleProfilePress}>
                     <Text style={styles.buttonText}>Profile</Text>
                 </TouchableOpacity>
-            </View>
+            </ScrollView>
         </View>
     );
 }
@@ -119,9 +120,7 @@ const styles = StyleSheet.create({
     },
     contentContainer: {
         flex: 1,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        padding: 20,
+        padding: 10,
     },
     comedorContainer: {
         backgroundColor: '#FFFFFF',
@@ -131,15 +130,21 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         borderRadius: 20,
         shadowColor: '#000',
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.1,
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 2 },
         elevation: 5,
         width: '100%',
         alignItems: 'center',
     },
+    comedorImage: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        marginBottom: 10,
+    },
     comedorTitle: {
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 5,
         color: 'orange',
