@@ -93,7 +93,7 @@ function HomePage() {
                 <TouchableOpacity style={styles.roundButton} onPress={handleProfilePress}>
                     <Text style={styles.buttonText}>Profile</Text>
                 </TouchableOpacity>
-            </ScrollView>
+            </View>
         </View>
     );
 }
