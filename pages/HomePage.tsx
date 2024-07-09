@@ -40,7 +40,7 @@ function HomePage() {
     };
 
     const handleProfilePress = () => {
-        navigation.navigate('RestaurantProfile');
+        navigation.navigate('ClientProfile');
         console.log("si llega a bag");
     };
 

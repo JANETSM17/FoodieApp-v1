@@ -14,7 +14,7 @@ function AppStack() {
       <Stack.Screen name="Home" component={HomePage} />
       <Stack.Screen name="RestaurantProfile" component={RestaurantProfile} />
       <Stack.Screen name="Menu" component={RestaurantScreen} />
-      <Stack.Screen name="UserProfile" component={UserProfile} />
+      <Stack.Screen name="ClientProfile" component={UserProfile} />
       <Stack.Screen name="HomeRestaurant" component={HomeRestaurant} />
       {/* <Stack.Screen name="Login" component={LoginPage} /> */}
     </Stack.Navigator>
