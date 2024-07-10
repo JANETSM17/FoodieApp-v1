@@ -6,6 +6,9 @@ import SecondSplashScreen from "../pages/SecondSplashScreenPage";
 import LoginPage from "../pages/LoginPage";
 import Register from "../pages/Register";
 import RestaurantProfile from "../pages/RestaurantProfile";
+import Bolsa from "../pages/Bolsa";
+import BagFinalDetails from "../pages/BagFinalDetails";
+import HomePage from "../pages/HomePage";
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +40,9 @@ function AuthStack() {
       <Stack.Screen name="Landing" component={LandingPage} />
       <Stack.Screen name="Login" component={LoginPage} />
       <Stack.Screen name="Register" component={Register} />
+      <Stack.Screen name="Bolsa" component={Bolsa} />
+      <Stack.Screen name="BagFinalDetails" component={BagFinalDetails} />
+      <Stack.Screen name="Homepage" component={HomePage} />
     </Stack.Navigator>
   );
 }

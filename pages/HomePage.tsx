@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, ScrollView, Image } from "react-native";
+import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, ScrollView, Image, Modal, TextInput } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from '@expo/vector-icons';
 import { getUserInfo, getComedores } from '../services/demoService';
 import useAuth from "../hooks/useAuth";
-import Header from "../components/Header"; // Importa el componente Header
 
 function HomePage() {
     const { logout } = useAuth();
     const [loading, setLoading] = useState(true);
     const [comedores, setComedores] = useState([]);
     const [cliente, setCliente] = useState(null);
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [comedorCode, setComedorCode] = useState('');
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -40,8 +42,20 @@ function HomePage() {
     };
 
     const handleProfilePress = () => {
+        navigation.navigate('Bolsa');
+    };
+
+    const handleAccountPress = () => {
         navigation.navigate('ClientProfile');
-        console.log("si llega a bag");
+    };
+
+    const handlePedidosPress = () => {
+        navigation.navigate('Pedidos');
+    };
+
+    const handleAddComedor = () => {
+        // Logic to handle adding a comedor
+        setModalVisible(false);
     };
 
     if (loading) {
@@ -59,13 +73,13 @@ function HomePage() {
 
     return (
         <View style={styles.mainContainer}>
-            <View style={styles.topBar}>
+            <View style={styles.headerContainer}>
                 <Image source={require('../assets/images/logos/FoodieOriginal.png')} style={styles.logo} />
+                <TouchableOpacity onPress={() => setModalVisible(true)}>
+                    <Ionicons name="add" size={24} color="#FFA500" />
+                </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.comedoresBtn}>
-                <Text style={styles.buttonText}>Comedores</Text>
-            </TouchableOpacity>
-            <View style={styles.contentContainer}>
+            <ScrollView contentContainerStyle={styles.contentContainer}>
                 {comedores.length === 0 ? (
                     <View style={styles.noComedoresContainer}>
                         <Text>No tienes ningún comedor guardado</Text>
@@ -77,13 +91,16 @@ function HomePage() {
                             style={styles.comedorContainer}
                             onPress={() => handleRestaurantPress()}
                         >
-                            <Text style={styles.comedorTitle}>{comedor.nombre}</Text>
-                            <Text style={styles.comedorRating}>
-                                Calificación: <Text style={styles.boldText}>{comedor.calif}</Text>
-                            </Text>
-                            <Text style={styles.comedorWait}>
-                                Tiempo de espera mínimo: <Text style={styles.boldText}>{comedor.min_espera} minutos</Text>
-                            </Text>
+                            <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.comedorImage} />
+                            <View style={styles.comedorInfo}>
+                                <Text style={styles.comedorTitle}>{comedor.nombre}</Text>
+                                <Text style={styles.comedorRating}>
+                                    Calificación: <Text style={styles.boldText}>{comedor.calif}</Text>
+                                </Text>
+                                <Text style={styles.comedorWait}>
+                                    Tiempo de espera mínimo: <Text style={styles.boldText}>{comedor.min_espera} minutos</Text>
+                                </Text>
+                            </View>
                         </TouchableOpacity>
                     ))
                 )}
@@ -93,7 +110,46 @@ function HomePage() {
                 <TouchableOpacity style={styles.roundButton} onPress={handleProfilePress}>
                     <Text style={styles.buttonText}>Profile</Text>
                 </TouchableOpacity>
+            </ScrollView>
+            <View style={styles.footer}>
+                <TouchableOpacity style={styles.footerButton}>
+                    <Ionicons name="home" size={24} color="black" />
+                    <Text style={styles.footerButtonText}>Inicio</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.footerButton} onPress={handlePedidosPress}>
+                    <Ionicons name="clipboard-outline" size={24} color="black" />
+                    <Text style={styles.footerButtonText}>Pedidos</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.footerButton} onPress={handleProfilePress}>
+                    <Ionicons name="bag-outline" size={24} color="black" />
+                    <Text style={styles.footerButtonText}>Bolsa</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.footerButton} onPress={handleAccountPress}>
+                    <Ionicons name="person-outline" size={24} color="black" />
+                    <Text style={styles.footerButtonText}>Perfil</Text>
+                </TouchableOpacity>
             </View>
+
+            <Modal
+                transparent={true}
+                visible={isModalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Código de comedor</Text>
+                        <TextInput
+                            style={styles.modalInput}
+                            placeholder="[xxxxxx]"
+                            value={comedorCode}
+                            onChangeText={setComedorCode}
+                        />
+                        <TouchableOpacity style={styles.addButton} onPress={handleAddComedor}>
+                            <Text style={styles.addButtonText}>Agregar comedor</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -103,61 +159,60 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F0F0F0',
     },
-    topBar: {
+    headerContainer: {
         height: 80,
         width: '100%',
         backgroundColor: 'black',
-        justifyContent: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        paddingTop: 20,
-        paddingBottom: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#CCCCCC',
+        paddingHorizontal: 20,
     },
     logo: {
         width: 180,
         height: 45,
     },
     contentContainer: {
-        flex: 1,
         padding: 10,
     },
     comedorContainer: {
         backgroundColor: '#FFFFFF',
         borderColor: 'black',
         borderWidth: 1,
-        padding: 20,
-        marginBottom: 20,
-        borderRadius: 20,
+        padding: 15,
+        marginBottom: 15,
+        borderRadius: 10,
         shadowColor: '#000',
         shadowOpacity: 0.1,
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 2 },
         elevation: 5,
-        width: '100%',
-        alignItems: 'center',
+        width: '90%',
+        alignSelf: 'center',
     },
     comedorImage: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+        width: '100%',
+        height: 120,
+        borderRadius: 10,
         marginBottom: 10,
     },
+    comedorInfo: {
+        alignItems: 'center',
+    },
     comedorTitle: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
         marginBottom: 5,
-        color: 'orange',
-        textAlign: 'center',
+        color: 'black',
     },
     comedorRating: {
-        fontSize: 16,
+        fontSize: 14,
         color: 'black',
         marginBottom: 3,
         textAlign: 'left',
     },
     comedorWait: {
-        fontSize: 16,
+        fontSize: 14,
         color: 'black',
         textAlign: 'left',
     },
@@ -166,14 +221,6 @@ const styles = StyleSheet.create({
     },
     roundButton: {
         backgroundColor: 'black',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 50,
-        alignItems: 'center',
-        margin: 20,
-    },
-    comedoresBtn: {
-        backgroundColor: 'orange',
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 50,
@@ -197,8 +244,64 @@ const styles = StyleSheet.create({
         shadowRadius: 10,
         shadowOffset: { width: 0, height: 2 },
         elevation: 5,
-        width: '100%',
+        width: '90%',
+        alignSelf: 'center',
+    },
+    footer: {
+        height: 60,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        borderTopWidth: 1,
+        borderTopColor: '#CCCCCC',
+        backgroundColor: 'white',
+    },
+    footerButton: {
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
+    },
+    footerButtonText: {
+        fontSize: 12,
+        color: 'black',
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        width: 300,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        alignItems: 'center',
+        padding: 20,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    modalInput: {
+        width: '80%',
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 10,
+        padding: 10,
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    addButton: {
+        backgroundColor: '#FFA500',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 20,
+        alignItems: 'center',
+    },
+    addButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 
