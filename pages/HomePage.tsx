@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, ScrollView, Image, Modal, TextInput, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from '@expo/vector-icons';
-import { getUserInfo, getComedores } from '../services/demoService';
+import { getUserInfo, getComedores, addComedor, deleteComedor } from '../services/demoService';
 import useAuth from "../hooks/useAuth";
 
 function HomePage() {
@@ -53,17 +53,20 @@ function HomePage() {
         navigation.navigate('Pedidos');
     };
 
-    const handleAddComedor = () => {
-        // Logic to handle adding a comedor
-        Alert.alert('Comedor agregado con éxito');
-        console.log("Comedor eliminado con éxito");
+    const handleAddComedor = async () => {
+        const result = await addComedor(comedorCode);
+        if (result) {
+            setComedorCode('');
+            handleLoad();
+        }
         setModalVisible(false);
     };
 
-    const handleDeleteComedor = () => {
-        // Logic to handle deleting a comedor
-        Alert.alert('Comedor eliminado con éxito');
-        console.log("Comedor eliminado con éxito");
+    const handleDeleteComedor = async (comedorId) => {
+        const result = await deleteComedor(comedorId);
+        if (result) {
+            handleLoad();
+        }
     };
 
     if (loading) {
@@ -96,7 +99,7 @@ function HomePage() {
                             style={styles.comedorContainer}
                             onPress={() => handleRestaurantPress()}
                         >
-                            <TouchableOpacity onPress={() => handleDeleteComedor()}>
+                            <TouchableOpacity onPress={() => handleDeleteComedor(comedor._id)}>
                                 <Ionicons name="close" size={30} color="black" />
                             </TouchableOpacity>
                             <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.comedorImage} />
