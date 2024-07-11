@@ -18,7 +18,7 @@ const BagFinalDetails = () => {
 
   const handleGoHome = () => {
     setModalVisible(false);
-    navigation.navigate('HomePage');
+    navigation.navigate('Home');
   };
 
   return (

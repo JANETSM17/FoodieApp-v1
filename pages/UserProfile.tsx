@@ -36,7 +36,6 @@ const UserProfile = () => {
       <View style={styles.profileContainer}>
         <Image source={require('../assets/images/fotosCliente/FoxClient.jpeg')} style={styles.image} />
         <Text style={styles.userFullName}>Laura Batista Luna</Text>
-        <Text style={styles.userName}>Laura Batista</Text>
       </View>
 
       <View style={styles.tabContainer}>
@@ -135,7 +134,7 @@ const UserProfile = () => {
             <TouchableOpacity style={styles.modalButton} onPress={handlePasswordChange}>
               <Text style={styles.modalButtonText}>Confirmar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modalButton} onPress={() => setChangePasswordModalVisible(false)}>
+            <TouchableOpacity style={styles.modalCancelButton} onPress={() => setChangePasswordModalVisible(false)}>
               <Text style={styles.modalButtonText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
@@ -165,7 +164,7 @@ const UserProfile = () => {
             <TouchableOpacity style={styles.modalButton} onPress={handleDeleteAccount}>
               <Text style={styles.modalButtonText}>Confirmar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modalButton} onPress={() => setDeleteAccountModalVisible(false)}>
+            <TouchableOpacity style={styles.modalCancelButton} onPress={() => setDeleteAccountModalVisible(false)}>
               <Text style={styles.modalButtonText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
@@ -210,10 +209,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginTop: 10,
-  },
-  userName: {
-    fontSize: 18,
-    color: 'gray',
   },
   tabContainer: {
     flexDirection: 'row',
@@ -350,21 +345,30 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 10,
     marginVertical: 10,
-    borderColor: 'gray',
+    borderColor: '#ddd',
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 20,
+    textAlign: 'center',
   },
   modalButton: {
     backgroundColor: '#FFBF00',
     padding: 10,
-    borderRadius: 10,
+    borderRadius: 20,
     alignItems: 'center',
     marginVertical: 10,
-    width: '100%',
+    width: '50%',
   },
   modalButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  modalCancelButton: {
+    backgroundColor: '#B3B3B3',
+    padding: 10,
+    borderRadius: 20,
+    alignItems: 'center',
+    marginVertical: 10,
+    width: '50%',
   },
 });
 
