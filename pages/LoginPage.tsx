@@ -45,7 +45,7 @@ function LoginPage() {
                         style={styles.loginInput}
                         onChangeText={setPassword}
                         secureTextEntry={true}
-                        placeholder="contraseña"
+                        placeholder="Contraseña"
                         placeholderTextColor="#A9A9A9"
                     />
                 </View>
@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
         padding: 15,
         width: '100%',
         alignItems: 'center',
+        alignSelf:'center',
     },
     loginButtonText: {
         color: '#FFFFFF',

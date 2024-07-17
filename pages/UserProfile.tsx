@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   editButton: {
     backgroundColor: '#000',
     padding: 10,
-    borderRadius: 10,
+    borderRadius: 20,
     alignItems: 'center',
     marginVertical: 10,
   },
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffc107',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 10,
+    borderRadius: 20,
     alignItems: 'center',
     marginVertical: 5,
   },

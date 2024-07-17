@@ -54,15 +54,21 @@ function HomePage() {
     };
 
     const handleAddComedor = async () => {
+        setLoading(true);
         const result = await addComedor(comedorCode);
         if (result) {
             setComedorCode('');
             handleLoad();
+        }else{
+            setComedorCode('');
+            Alert.alert("Hubo un error, revisa que ingresaste el código correcto");
+            setLoading(false);
         }
         setModalVisible(false);
     };
 
     const handleDeleteComedor = async (comedorId) => {
+        setLoading(true);
         const result = await deleteComedor(comedorId);
         if (result) {
             handleLoad();
@@ -199,6 +205,7 @@ const styles = StyleSheet.create({
         height: 120,
         borderRadius: 10,
         marginBottom: 10,
+        resizeMode: 'contain',
     },
     comedorInfo: {
         alignItems: 'center',

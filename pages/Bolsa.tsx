@@ -232,6 +232,7 @@ const styles = StyleSheet.create({
   },
   nextButton: {
     marginTop: 20,
+    marginBottom:10,
     backgroundColor: '#FFC107',
     paddingVertical: 15,
     borderRadius: 10,

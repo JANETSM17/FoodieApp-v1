@@ -1,11 +1,9 @@
 import { NavigationContainer } from "@react-navigation/native";
 import React from "react";
-import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
+import { View, ActivityIndicator, StyleSheet } from "react-native";
 import AuthStack from "./AuthStack";
 import AppStack from "./AppStack";
 import useAuth from "../hooks/useAuth";
-import FirstSplashScreen from "../pages/FirstSplashScreenPage";
-import HomePage from "../pages/HomePage";
 
 
 function Router() {
@@ -13,9 +11,6 @@ function Router() {
 
   if (loading) {
     return (
-      // <View style={styles.container}>
-      //   <FirstSplashScreen />
-      // </View>
       <View style={styles.mainContainer}>
         <ActivityIndicator size="large" color="#1E90FF" />
       </View>
