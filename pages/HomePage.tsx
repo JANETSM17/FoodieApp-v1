@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from '@expo/vector-icons';
 import { getUserInfo, getComedores, addComedor, deleteComedor } from '../services/demoService';
 import useAuth from "../hooks/useAuth";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function HomePage() {
     const { logout } = useAuth();
@@ -37,9 +38,14 @@ function HomePage() {
         }
     };
 
-    const handleRestaurantPress = () => {
-        navigation.navigate('Menu');
-    };
+    const handleRestaurantPress = async (comedorId) => {
+        try {
+          await AsyncStorage.setItem('selectedComedorId', comedorId);
+          navigation.navigate('Menu');
+        } catch (error) {
+          console.error('Error saving comedor ID:', error);
+        }
+      };
 
     const handleBagPress = () => {
         navigation.navigate('Bolsa');
@@ -103,7 +109,7 @@ function HomePage() {
                         <TouchableOpacity
                             key={comedor._id}
                             style={styles.comedorContainer}
-                            onPress={() => handleRestaurantPress()}
+                            onPress={() => handleRestaurantPress(comedor._id)}
                         >
                             <TouchableOpacity onPress={() => handleDeleteComedor(comedor._id)}>
                                 <Ionicons name="close" size={30} color="black" />

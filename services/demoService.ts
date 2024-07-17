@@ -121,4 +121,160 @@ async function deleteComedor(comedorId) {
   }
 }
 
-export { getUserInfo, getComedores, addComedor, deleteComedor };
+async function getComedor(id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}comedor/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error fetching comedor");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching comedor info:", error);
+    return null;
+  }
+}
+
+async function getComida(id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}comedor/${id}/comida`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error fetching comedor");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching comedor info:", error);
+    return null;
+  }
+}
+
+async function getBebidas(id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}comedor/${id}/bebidas`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error fetching comedor");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching comedor info:", error);
+    return null;
+  }
+}
+
+async function getFrituras(id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}comedor/${id}/frituras`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error fetching comedor");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching comedor info:", error);
+    return null;
+  }
+}
+
+async function getDulces(id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}comedor/${id}/dulces`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error fetching comedor");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching comedor info:", error);
+    return null;
+  }
+}
+
+async function getOtros(id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}comedor/${id}/otros`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error fetching comedor");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching comedor info:", error);
+    return null;
+  }
+}
+
+export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros };

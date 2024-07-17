@@ -1,45 +1,64 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import React, { useState } from 'react';
-import { Ionicons } from '@expo/vector-icons'; // Asegúrate de tener instalado @expo/vector-icons
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros } from '../services/demoService';
 
 const RestaurantScreen = () => {
   const [selectedMenu, setSelectedMenu] = useState('Comida');
   const [cart, setCart] = useState([]);
+  const [comedor, setComedor] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
-  const menuItems = {
-    Comida: [
-      { name: 'Hamburguesa', price: '$79.99', image: require('../assets/images/comida/hamburger.png') },
-      { name: 'Pizza', price: '$99.99', image: require('../assets/images/comida/pizza.png') },
-      { name: 'Tacos', price: '$59.99', image: require('../assets/images/comida/taco.png') },
-    ],
-    Bebidas: [
-      { name: 'Sprite', price: '$25', image: require('../assets/images/comida/soda-can.png') },
-      { name: 'Coca-Cola', price: '$30', image: require('../assets/images/comida/soda-can.png') },
-      { name: 'Fanta', price: '$25', image: require('../assets/images/comida/soda-can.png') },
-    ],
-    Frituras: [
-      { name: 'Papas Fritas', price: '$20', image: require('../assets/images/comida/fries.png') },
-      { name: 'Chips', price: '$15', image: require('../assets/images/comida/fries.png') },
-      { name: 'Nachos', price: '$35', image: require('../assets/images/comida/nachos.png') },
-    ],
-    Dulces: [
-      { name: 'Chocolate', price: '$10', image: require('../assets/images/comida/chocolate.png') },
-      { name: 'Gomitas', price: '$15', image: require('../assets/images/comida/chocolate.png') },
-      { name: 'Caramelos', price: '$5', image: require('../assets/images/comida/chocolate.png') },
-    ],
-    Otros: [
-      { name: 'Burrito', price: '$50', image: require('../assets/images/comida/burrito.png') },
-      { name: 'Dona', price: '$60', image: require('../assets/images/comida/donut.png') },
-      { name: 'Yogurt', price: '$20', image: require('../assets/images/comida/chocolate.png') },
-    ],
-  };
+  const [menuItems, setMenuItems] = useState({
+    Comida: [],
+    Bebidas: [],
+    Frituras: [],
+    Dulces: [],
+    Otros: [],
+  });
 
   const addToCart = (item) => {
     setCart([...cart, item]);
     Alert.alert('Producto agregado', `${item.name} ha sido agregado al carrito`);
   };
+
+  useEffect(() => {
+    handleLoadComedorData();
+  }, []);
+
+  const handleLoadComedorData = async () => {
+    setLoading(true);
+    try {
+      const comedorId = await AsyncStorage.getItem('selectedComedorId');
+      if (comedorId) {
+        const comedorInfo = await getComedor(comedorId);
+        setComedor(comedorInfo);
+        setMenuItems({
+          Comida: await getComida(comedorId),
+          Bebidas: await getBebidas(comedorId),
+          Frituras: await getFrituras(comedorId),
+          Dulces: await getDulces(comedorId),
+          Otros: await getOtros(comedorId),
+        });
+        console.log(menuItems);
+      }
+    } catch (error) {
+      console.error("Error loading comedor data:", error);
+    } finally {
+      setLoading(false);
+  }
+  };
+
+  if (loading) {
+    return (
+        <View style={styles.container}>
+            <ActivityIndicator size="large" color="#1E90FF" />
+        </View>
+    );
+}
 
   return (
     <ScrollView style={styles.container}>
@@ -50,7 +69,7 @@ const RestaurantScreen = () => {
         <Image source={require('../assets/images/logos/FoodieNegro.png')} style={styles.fBlack} />
       </View>
       <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.restaurantImage} />
-      <Text style={styles.restaurantName}>Cafeteria BIS</Text>
+      <Text style={styles.restaurantName}>{comedor.nombre}</Text>
 
       <View style={styles.menuTabs}>
         {Object.keys(menuItems).map((menu) => (
@@ -66,10 +85,10 @@ const RestaurantScreen = () => {
 
       {menuItems[selectedMenu].map((item, index) => (
         <View key={index} style={styles.menuItem}>
-          <Image source={item.image} style={styles.menuItemImage} />
+          <Image source={item.imagen} style={styles.menuItemImage} /> 
           <View style={styles.menuItemInfo}>
-            <Text style={styles.menuItemText}>{item.name}</Text>
-            <Text style={styles.menuItemPrice}>{item.price}</Text>
+            <Text style={styles.menuItemText}>{item.nombre}</Text>
+            <Text style={styles.menuItemPrice}>${item.precio}</Text>
           </View>
           <TouchableOpacity style={styles.addButton} onPress={() => addToCart(item)}>
             <Image source={require('../assets/images/recursosExtras/AgregarbolsaB.png')} style={styles.addButtonImage} />
