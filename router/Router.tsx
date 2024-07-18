@@ -12,7 +12,7 @@ function Router() {
   if (loading) {
     return (
       <View style={styles.mainContainer}>
-        <ActivityIndicator size="large" color="#1E90FF" />
+        <ActivityIndicator size="large" color="#F5B000" />
       </View>
     );
   }
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F0F8FF',
+    backgroundColor: '#F0F0F0',
     padding: 20,
   },
 });

@@ -83,8 +83,8 @@ function HomePage() {
 
     if (loading) {
         return (
-            <View style={styles.mainContainer}>
-                <ActivityIndicator size="large" color="#1E90FF" />
+            <View style={styles.containerActivityIndicator}>
+                <ActivityIndicator size="large" color="#F5B000" />
             </View>
         );
     }
@@ -171,6 +171,13 @@ function HomePage() {
 }
 
 const styles = StyleSheet.create({
+    containerActivityIndicator:{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F0F0F0',
+        padding: 20,
+    },
     mainContainer: {
         flex: 1,
         backgroundColor: '#F0F0F0',

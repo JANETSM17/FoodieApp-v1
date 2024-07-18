@@ -22,7 +22,8 @@ const RestaurantScreen = () => {
 
   const addToCart = (item) => {
     setCart([...cart, item]);
-    Alert.alert('Producto agregado', `${item.name} ha sido agregado al carrito`);
+    Alert.alert('Producto agregado', `${item.nombre} ha sido agregado al carrito`);
+    console.log(cart);
   };
 
   useEffect(() => {
@@ -54,8 +55,8 @@ const RestaurantScreen = () => {
 
   if (loading) {
     return (
-        <View style={styles.container}>
-            <ActivityIndicator size="large" color="#1E90FF" />
+        <View style={styles.containerActivityIndicator}>
+            <ActivityIndicator size="large" color="#F5B000" />
         </View>
     );
 }
@@ -88,6 +89,7 @@ const RestaurantScreen = () => {
           <Image source={item.imagen} style={styles.menuItemImage} /> 
           <View style={styles.menuItemInfo}>
             <Text style={styles.menuItemText}>{item.nombre}</Text>
+            <Text style={styles.menuItemDescription}>{item.descripcion}</Text>
             <Text style={styles.menuItemPrice}>${item.precio}</Text>
           </View>
           <TouchableOpacity style={styles.addButton} onPress={() => addToCart(item)}>
@@ -102,6 +104,13 @@ const RestaurantScreen = () => {
 export default RestaurantScreen;
 
 const styles = StyleSheet.create({
+  containerActivityIndicator:{
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F0F0F0',
+    padding: 20,
+},
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -178,6 +187,10 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     fontSize: 18,
+  },
+  menuItemDescription: {
+    fontSize: 12,
+    color: '#666',
   },
   menuItemPrice: {
     fontSize: 18,

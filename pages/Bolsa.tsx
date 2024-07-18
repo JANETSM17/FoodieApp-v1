@@ -94,16 +94,16 @@ const Bolsa = () => {
               <Text style={styles.itemPrice}>${item.price}</Text>
               <View style={styles.itemActions}>
                 <TouchableOpacity style={styles.quantityButton} onPress={() => decrementQuantity(item.id)}>
-                  <Text style={styles.quantityText}>-</Text>
+                  <Ionicons name="remove-circle" size={30} color="#FFC107" />
                 </TouchableOpacity>
                 <Text style={styles.quantityNumber}>{item.quantity}</Text>
                 <TouchableOpacity style={styles.quantityButton} onPress={() => incrementQuantity(item.id)}>
-                  <Text style={styles.quantityText}>+</Text>
+                  <Ionicons name="add-circle" size={30} color="#FFC107" />
                 </TouchableOpacity>
               </View>
             </View>
             <TouchableOpacity style={styles.deleteButton} onPress={() => deleteItem(item.id)}>
-              <Text style={styles.deleteButtonText}>X</Text>
+              <Ionicons name="trash-outline" size={25} color="#f00" />
             </TouchableOpacity>
           </View>
         ))}
@@ -191,13 +191,8 @@ const styles = StyleSheet.create({
     height: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFC107',
+    
     borderRadius: 15,
-  },
-  quantityText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
   },
   quantityNumber: {
     marginHorizontal: 10,
@@ -207,13 +202,8 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     marginLeft: 10,
-    backgroundColor: '#f00',
     padding: 5,
     borderRadius: 5,
-  },
-  deleteButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
   summaryContainer: {
     flexDirection: 'row',
