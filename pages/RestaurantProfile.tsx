@@ -1,26 +1,41 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Switch } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native';
 import React, { useState } from 'react';
-import { Ionicons } from '@expo/vector-icons'; // Asegúrate de tener instalado @expo/vector-icons
+import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
-import useAuth from '../hooks/useAuth'; // Importa useAuth
-import Header2 from '../components/Header2'; // Importa Header2
+import useAuth from '../hooks/useAuth'; 
+import Header2 from '../components/Header2'; 
 
 const RestaurantProfile = () => {
   const [selectedTab, setSelectedTab] = useState('Información');
   const [isToggleOn, setIsToggleOn] = useState(true);
+  const [email, setEmail] = useState('wendys@foodie.com');
+  const [phone, setPhone] = useState('614-123-2345');
+  const [address, setAddress] = useState('Calle Marciano #114 Col. IV');
+  const [prepTime, setPrepTime] = useState('5 minutos');
+  const [rating, setRating] = useState('4 / 5');
+  const [isEditingInfo, setIsEditingInfo] = useState(false);
+  const [isEditingPrepTime, setIsEditingPrepTime] = useState(false);
+  const [isFaqVisible, setIsFaqVisible] = useState(false);
   const navigation = useNavigation();
-  const { logout } = useAuth(); // Obtiene la función logout de useAuth
+  const { logout } = useAuth();
 
   const handleToggleChange = () => setIsToggleOn(previousState => !previousState);
+  const toggleFaqVisibility = () => setIsFaqVisible(!isFaqVisible);
 
   return (
     <ScrollView style={styles.container}>
-      <Header2 /> {/* Usa Header2 aquí */}
-      
+      <View style={styles.headerContainer}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Image source={require('../assets/images/logos/FoodieOriginal.png')} style={styles.logo} />
+        <View style={{ width: 40 }}></View>
+      </View>
+
       <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.restaurantImage} />
       <Text style={styles.restaurantName}>Wendys</Text>
       <Text style={styles.restaurantCode}>AS98DF2</Text>
-      
+
       <View style={styles.toggleButtons}>
         <TouchableOpacity style={[styles.toggleButton, selectedTab === 'Información' && styles.selectedTab]} onPress={() => setSelectedTab('Información')}>
           <Text style={styles.toggleButtonText}>Información</Text>
@@ -32,33 +47,91 @@ const RestaurantProfile = () => {
 
       {selectedTab === 'Información' && (
         <View style={styles.infoSection}>
-          <View style={styles.infoRow}>
-            <Image source={require('../assets/images/restaurantes/LittleCaesars_Logo.png')} style={styles.icon} />
-            <Text style={styles.infoText}>wendys@foodie.com</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Image source={require('../assets/images/recursosExtras/home.png')} style={styles.icon} />
-            <Text style={styles.infoText}>614-123-2345</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Image source={require('../assets/images/recursosExtras/home.png')} style={styles.icon} />
-            <Text style={styles.infoText}>Calle Marciano #114 Col. IV</Text>
-          </View>
-          <TouchableOpacity style={styles.editButton}>
-            <Text style={styles.editButtonText}>Editar</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.sectionTitle}>Tiempo de preparación por pedido:</Text>
-          <View style={styles.preparationTimeRow}>
-            <Text style={styles.preparationTimeText}>5 minutos</Text>
-            <TouchableOpacity style={styles.editButtonSmall}>
-              <Text style={styles.editButtonTextSmall}>Editar</Text>
+          <View style={styles.infoCard}>
+            <View style={styles.infoRow}>
+              <Ionicons name="mail-outline" size={20} color="#FFA500" style={styles.icon} />
+              {isEditingInfo ? (
+                <TextInput
+                  style={styles.input}
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              ) : (
+                <Text style={styles.infoText}>{email}</Text>
+              )}
+            </View>
+            <View style={styles.divider} />
+            <View style={styles.infoRow}>
+              <Ionicons name="call-outline" size={20} color="#FFA500" style={styles.icon} />
+              {isEditingInfo ? (
+                <TextInput
+                  style={styles.input}
+                  value={phone}
+                  onChangeText={setPhone}
+                />
+              ) : (
+                <Text style={styles.infoText}>{phone}</Text>
+              )}
+            </View>
+            <View style={styles.divider} />
+            <View style={styles.infoRow}>
+              <Ionicons name="location-outline" size={20} color="#FFA500" style={styles.icon} />
+              {isEditingInfo ? (
+                <TextInput
+                  style={styles.input}
+                  value={address}
+                  onChangeText={setAddress}
+                />
+              ) : (
+                <Text style={styles.infoText}>{address}</Text>
+              )}
+            </View>
+            <TouchableOpacity style={styles.editButton} onPress={() => setIsEditingInfo(!isEditingInfo)}>
+              <Text style={styles.editButtonText}>{isEditingInfo ? 'Guardar' : 'Editar'}</Text>
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.sectionTitle}>Calificación como restaurante:</Text>
-          <View style={styles.ratingRow}>
-            <Text style={styles.ratingText}>4 / 5</Text>
+          <View style={styles.infoCard}>
+            <Text style={styles.sectionTitle}>Tiempo de preparación por pedido:</Text>
+            {isEditingPrepTime ? (
+              <TextInput
+                style={styles.input}
+                value={prepTime}
+                onChangeText={setPrepTime}
+              />
+            ) : (
+              <Text style={styles.infoText}>{prepTime}</Text>
+            )}
+            <TouchableOpacity style={styles.editButton} onPress={() => setIsEditingPrepTime(!isEditingPrepTime)}>
+              <Text style={styles.editButtonText}>{isEditingPrepTime ? 'Guardar' : 'Editar'}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.infoCard}>
+            <Text style={styles.sectionTitle}>Calificación como restaurante:</Text>
+            <Text style={styles.infoText}>{rating}</Text>
+          </View>
+
+          <View style={styles.infoCard}>
+            <TouchableOpacity onPress={toggleFaqVisibility}>
+              <Text style={styles.sectionTitle}>Preguntas frecuentes</Text>
+            </TouchableOpacity>
+            {isFaqVisible && (
+              <View>
+                <View style={styles.faqItem}>
+                  <Text style={styles.faqQuestion}>Q: What is Foodie?</Text>
+                  <Text style={styles.faqAnswer}>A: Foodie is an online platform that allows users to order food from cafeterias and restaurants within designated areas...</Text>
+                </View>
+                <View style={styles.faqItem}>
+                  <Text style={styles.faqQuestion}>Q: How does Foodie work?</Text>
+                  <Text style={styles.faqAnswer}>A: Users can browse the menu of participating restaurants, select their desired items, and place an order...</Text>
+                </View>
+                <View style={styles.faqItem}>
+                  <Text style={styles.faqQuestion}>Q: Is Foodie available for everyone?</Text>
+                  <Text style={styles.faqAnswer}>A: Foodie is available for registered users within the specified cafeterias or restaurants...</Text>
+                </View>
+              </View>
+            )}
           </View>
 
           <TouchableOpacity style={styles.actionButton}>
@@ -67,7 +140,7 @@ const RestaurantProfile = () => {
           <TouchableOpacity style={styles.actionButton}>
             <Text style={styles.actionButtonText}>Eliminar cuenta</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton} onPress={logout}> {/* Agrega onPress para logout */}
+          <TouchableOpacity style={styles.actionButton} onPress={logout}>
             <Text style={styles.actionButtonText}>Cerrar Sesión</Text>
           </TouchableOpacity>
         </View>
@@ -113,23 +186,6 @@ const RestaurantProfile = () => {
             </View>
             <Switch value={isToggleOn} onValueChange={handleToggleChange} />
           </View>
-
-          <Text style={styles.sectionTitle}>Preguntas frecuentes</Text>
-          <View style={styles.faqItem}>
-            <Text style={styles.faqQuestion}>Q: What is Foodie?</Text>
-            <Text style={styles.faqAnswer}>A: Foodie is an online platform that allows users to order food from cafeterias and restaurants within designated areas...</Text>
-          </View>
-          <View style={styles.faqItem}>
-            <Text style={styles.faqQuestion}>Q: How does Foodie work?</Text>
-            <Text style={styles.faqAnswer}>A: Users can browse the menu of participating restaurants, select their desired items, and place an order...</Text>
-          </View>
-          <View style={styles.faqItem}>
-            <Text style={styles.faqQuestion}>Q: Is Foodie available for everyone?</Text>
-            <Text style={styles.faqAnswer}>A: Foodie is available for registered users within the specified cafeterias or restaurants...</Text>
-          </View>
-          <TouchableOpacity style={styles.contactButton}>
-            <Text style={styles.contactButtonText}>Contact us</Text>
-          </TouchableOpacity>
         </View>
       )}
     </ScrollView>
@@ -144,22 +200,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 25,
   },
-  header: {
+  headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    backgroundColor: 'black',
+    justifyContent: 'space-between',
+    width: '100%',
   },
-  backButton: {
-    padding: 10,
-  },
-  backButtonText: {
-    fontSize: 24,
-    color: '#000',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginLeft: 10,
+  logo: {
+    width: 180,
+    height: 45,
   },
   restaurantImage: {
     width: 100,
@@ -175,7 +227,7 @@ const styles = StyleSheet.create({
   },
   restaurantCode: {
     fontSize: 16,
-    color: '#FFC107',
+    color: '#FFA500',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -201,25 +253,50 @@ const styles = StyleSheet.create({
   infoSection: {
     paddingHorizontal: 10,
   },
+  infoCard: {
+    backgroundColor: '#f8f8f8',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 5,
+  },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
   },
   icon: {
-    width: 20,
-    height: 20,
     marginRight: 10,
   },
   infoText: {
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#ccc',
+    marginVertical: 10,
+  },
+  input: {
+    flex: 1,
+    padding: 10,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 10,
+    textAlign: 'center',
   },
   editButton: {
     backgroundColor: '#000',
     padding: 10,
-    borderRadius: 10,
+    borderRadius: 20,
     alignItems: 'center',
     marginVertical: 10,
+    width: '60%',
+    alignSelf: 'center',
   },
   editButtonText: {
     color: '#fff',
@@ -228,40 +305,17 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginVertical: 10,
-  },
-  preparationTimeRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  preparationTimeText: {
-    fontSize: 16,
-  },
-  editButtonSmall: {
-    backgroundColor: '#000',
-    padding: 5,
-    borderRadius: 5,
-  },
-  editButtonTextSmall: {
-    color: '#fff',
-  },
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 10,
-  },
-  ratingText: {
-    fontSize: 16,
-    marginLeft: 10,
   },
   actionButton: {
     backgroundColor: '#ffc107',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 10,
+    borderRadius: 20,
     alignItems: 'center',
     marginVertical: 5,
+    width: '60%',
+    alignSelf: 'center',
   },
   actionButtonText: {
     fontSize: 16,
@@ -348,11 +402,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
-  },
-  fBlack: {
-    width: 100,
-    height: 25,
-    marginBottom: 20,
-    marginTop: 25,
   },
 });

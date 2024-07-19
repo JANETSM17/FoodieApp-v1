@@ -25,9 +25,10 @@ const BagFinalDetails = () => {
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="black" />
+          <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
-        <Text style={styles.header}>Detalles</Text>
+        <Text style={styles.headerText}>Detalles</Text>
+        <View style={{ width: 40 }}></View> {/* Placeholder for alignment */}
       </View>
 
       <Text style={styles.chooseText}>Selecciona como lo quieres!</Text>
@@ -122,36 +123,42 @@ const BagFinalDetails = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#fff',
   },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    backgroundColor: 'black',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   backButton: {
-    marginRight: 10,
     width: 40,
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 20,
   },
-  header: {
+  headerText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#000',
+    color: 'white',
+    textAlign: 'center',
+    flex: 1,
   },
   chooseText: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginVertical: 20,
+    marginHorizontal: 15,
   },
   optionContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
+    paddingHorizontal: 15,
   },
   optionButton: {
     flex: 1,
@@ -162,7 +169,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   selectedOptionButton: {
-    backgroundColor: '#FFC107',
+    backgroundColor: '#FFA500',
   },
   optionImage: {
     width: 40,
@@ -183,6 +190,7 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: 'top',
     color: '#000',
+    marginHorizontal: 15,
   },
   timeContainer: {
     flexDirection: 'row',
@@ -216,11 +224,14 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   confirmButton: {
-    backgroundColor: '#FFC107',
-    paddingVertical: 15,
-    borderRadius: 10,
-    alignItems: 'center',
     marginTop: 20,
+    marginBottom: 10,
+    backgroundColor: '#FFA500',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    alignItems: 'center',
+    marginHorizontal: 15,
   },
   confirmButtonText: {
     color: '#fff',
@@ -252,7 +263,7 @@ const styles = StyleSheet.create({
   },
   homeButton: {
     marginTop: 20,
-    backgroundColor: '#FFC107',
+    backgroundColor: '#FFA500',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
