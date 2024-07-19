@@ -83,7 +83,7 @@ const Bolsa = () => {
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Bolsa</Text>
-        <View style={{ width: 40 }}></View> {/* Placeholder for alignment */}
+        <View style={styles.headerPlaceholder} />
       </View>
       <ScrollView style={styles.scrollContainer} contentContainerStyle={{ paddingBottom: 100 }}>
         {items.map((item) => (
@@ -154,6 +154,9 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     flex: 1,
+  },
+  headerPlaceholder: {
+    width: 40,
   },
   itemContainer: {
     flexDirection: 'row',

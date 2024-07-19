@@ -184,10 +184,11 @@ const styles = StyleSheet.create({
     left: 20,
   },
   logo: {
-    width: 50,
-    height: 50,
+    width: 200,
+    height: 100,
     alignSelf: 'center',
     marginBottom: 10,
+    resizeMode: "contain",
   },
   inputRow: {
     flexDirection: 'row',

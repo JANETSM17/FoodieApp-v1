@@ -40,7 +40,7 @@ const UserProfile = () => {
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Mi cuenta</Text>
-        <View style={{ width: 40 }}></View> {/* Placeholder for alignment */}
+        <View style={{ width: 40 }} />
       </View>
 
       <View style={styles.profileContainer}>
@@ -65,9 +65,13 @@ const UserProfile = () => {
       </TouchableOpacity>
 
       <View style={styles.cardContainer}>
-        <Text style={styles.detailText}>Te uniste el: <Text style={styles.orangeText}>{joinDate}</Text></Text>
+        <Text style={styles.detailText}>
+          Te uniste el: <Text style={styles.orangeText}>{joinDate}</Text>
+        </Text>
         <View style={styles.divider} />
-        <Text style={styles.detailText}>Total gastado: <Text style={styles.orangeText}>{totalSpent}</Text></Text>
+        <Text style={styles.detailText}>
+          Total gastado: <Text style={styles.orangeText}>{totalSpent}</Text>
+        </Text>
       </View>
 
       <View style={styles.divider} />
@@ -81,8 +85,7 @@ const UserProfile = () => {
       <TouchableOpacity style={styles.actionButton} onPress={logout}>
         <Text style={styles.actionButtonText}>Cerrar Sesión</Text>
       </TouchableOpacity>
-
-      {/* Edit Information Modal */}
+      
       <Modal
         transparent={true}
         animationType="fade"
@@ -114,7 +117,6 @@ const UserProfile = () => {
         </View>
       </Modal>
 
-      {/* Change Password Modal */}
       <Modal
         transparent={true}
         animationType="fade"
@@ -148,7 +150,6 @@ const UserProfile = () => {
         </View>
       </Modal>
 
-      {/* Delete Account Modal */}
       <Modal
         transparent={true}
         animationType="fade"
@@ -235,78 +236,64 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   cardContainer: {
-    backgroundColor: '#F8F8F8',
-    borderColor: '#FFA500',
-    borderWidth: 1,
+    backgroundColor: 'white',
     padding: 15,
-    marginBottom: 15,
-    borderRadius: 20,
+    marginHorizontal: 15,
+    borderRadius: 10,
+    marginBottom: 10,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
     shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
     elevation: 5,
-    width: '90%',
-    alignSelf: 'center',
   },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 5,
+    paddingVertical: 5,
   },
   icon: {
     marginRight: 10,
   },
   detailText: {
     fontSize: 16,
-    fontWeight: 'bold',
-  },
-  orangeText: {
-    color: 'orange',
-    fontWeight: 'bold',
+    color: 'black',
   },
   divider: {
     height: 1,
-    backgroundColor: '#ccc',
-    marginVertical: 10,
+    backgroundColor: '#ddd',
+    marginVertical: 5,
+  },
+  orangeText: {
+    color: 'orange',
   },
   editButton: {
-    backgroundColor: '#000',
-    padding: 10,
-    borderRadius: 20,
+    backgroundColor: 'orange',
+    padding: 15,
+    borderRadius: 10,
+    marginHorizontal: 15,
+    marginBottom: 15,
     alignItems: 'center',
-    marginVertical: 10,
-    width: '60%',
-    alignSelf: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 5,
+    justifyContent: 'center',
   },
   editButtonText: {
-    color: '#fff',
+    color: 'white',
+    fontSize: 18,
     fontWeight: 'bold',
   },
   actionButton: {
-    backgroundColor: '#ffc107',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
+    backgroundColor: 'orange',
+    padding: 15,
+    borderRadius: 10,
+    marginHorizontal: 15,
+    marginBottom: 15,
     alignItems: 'center',
-    marginVertical: 5,
-    width: '60%',
-    alignSelf: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 5,
+    justifyContent: 'center',
   },
   actionButtonText: {
-    fontSize: 16,
+    color: 'white',
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
   },
   modalContainer: {
     flex: 1,
@@ -315,57 +302,56 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: '80%',
-    padding: 20,
     backgroundColor: 'white',
     borderRadius: 10,
+    padding: 20,
+    width: '80%',
     alignItems: 'center',
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 15,
+  },
+  modalButton: {
+    backgroundColor: 'orange',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+  modalCancelButton: {
+    backgroundColor: '#aaa',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   modalWarningTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    marginBottom: 15,
     color: 'red',
-    marginBottom: 20,
   },
   modalWarningText: {
     fontSize: 16,
-    color: 'red',
-    marginBottom: 20,
+    marginBottom: 15,
     textAlign: 'center',
   },
   input: {
     width: '100%',
     padding: 10,
-    marginVertical: 10,
-    borderColor: '#ddd',
+    borderRadius: 5,
     borderWidth: 1,
-    borderRadius: 20,
-    textAlign: 'center',
-  },
-  modalButton: {
-    backgroundColor: '#FFBF00',
-    padding: 10,
-    borderRadius: 20,
-    alignItems: 'center',
-    marginVertical: 10,
-    width: '50%',
-  },
-  modalButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  modalCancelButton: {
-    backgroundColor: '#B3B3B3',
-    padding: 10,
-    borderRadius: 20,
-    alignItems: 'center',
-    marginVertical: 10,
-    width: '50%',
+    borderColor: '#ddd',
+    marginBottom: 10,
   },
 });
 

@@ -1,6 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomePage from "../pages/HomePage";
-import LoginPage from "../pages/LoginPage";
 import RestaurantProfile from "../pages/RestaurantProfile";
 import RestaurantScreen from "../pages/RestaurantScreen";
 import UserProfile from "../pages/UserProfile";
@@ -8,7 +7,6 @@ import HomeRestaurant from "../pages/HomeRestaurant";
 import Bolsa from "../pages/Bolsa";
 import BagFinalDetails from "../pages/BagFinalDetails";
 import Pedidos from "../pages/Pedidos";
-//import MenuRestaurant from "../pages/MenuRestaurant";
 
 
 const Stack = createNativeStackNavigator();
@@ -23,8 +21,6 @@ function AppStack() {
       <Stack.Screen name="Bolsa" component={Bolsa} />
       <Stack.Screen name="BagFinalDetails" component={BagFinalDetails} />
       <Stack.Screen name="Pedidos" component={Pedidos} />
-      {/*<Stack.Screen name="MenuRestaurant" component={MenuRestaurant} />*/}
-      {/* <Stack.Screen name="Login" component={LoginPage} /> */}
     </Stack.Navigator>
   );
 }

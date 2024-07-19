@@ -110,7 +110,7 @@ function HomePage() {
                             style={styles.comedorContainer}
                             onPress={() => handleRestaurantPress(comedor._id)}
                         >
-                            <TouchableOpacity style={styles.closeButton} onPress={() => handleDeleteComedor(comedor._id)}>
+                            <TouchableOpacity onPress={() => handleDeleteComedor(comedor._id)}>
                                 <Ionicons name="close" size={30} color="black" />
                             </TouchableOpacity>
                             <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.comedorImage} />
@@ -230,8 +230,9 @@ const styles = StyleSheet.create({
     comedorImage: {
         width: 60,
         height: 60,
-        borderRadius: 30,
+        borderRadius: 10,
         marginRight: 10,
+        resizeMode: "contain",
     },
     comedorInfo: {
         flex: 1,
@@ -318,6 +319,21 @@ const styles = StyleSheet.create({
     addButtonText: {
         color: 'white',
         fontWeight: 'bold',
+    },
+    noComedoresContainer: {
+        backgroundColor: '#FFFFFF',
+        borderColor: 'black',
+        borderWidth: 1,
+        padding: 20,
+        marginBottom: 20,
+        borderRadius: 20,
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 5,
+        width: '90%',
+        alignSelf: 'center',
     },
 });
 
