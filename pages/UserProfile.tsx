@@ -5,12 +5,16 @@ import { useNavigation } from '@react-navigation/native';
 import useAuth from '../hooks/useAuth'; 
 
 const UserProfile = () => {
-  const [selectedTab, setSelectedTab] = useState('Información');
   const [isChangePasswordModalVisible, setChangePasswordModalVisible] = useState(false);
   const [isDeleteAccountModalVisible, setDeleteAccountModalVisible] = useState(false);
+  const [isEditInfoModalVisible, setEditInfoModalVisible] = useState(false);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [deletePassword, setDeletePassword] = useState('');
+  const [email, setEmail] = useState('laurabl@gmail.com');
+  const [phone, setPhone] = useState('614-123-2345');
+  const [joinDate] = useState('1/Mayo/2024');
+  const [totalSpent] = useState('$368');
   const navigation = useNavigation();
   const { logout } = useAuth(); 
 
@@ -24,13 +28,19 @@ const UserProfile = () => {
     setDeleteAccountModalVisible(false);
   };
 
+  const handleEditInfo = () => {
+    Alert.alert('Información editada con éxito');
+    setEditInfoModalVisible(false);
+  };
+
   return (
     <ScrollView style={styles.mainContainer}>
-      <View style={styles.header}>
+      <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="black" />
+          <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
-        <Image source={require('../assets/images/logos/FoodieNegro.png')} style={styles.fBlack} />
+        <Text style={styles.headerText}>Mi cuenta</Text>
+        <View style={{ width: 40 }}></View> {/* Placeholder for alignment */}
       </View>
 
       <View style={styles.profileContainer}>
@@ -38,74 +48,71 @@ const UserProfile = () => {
         <Text style={styles.userFullName}>Laura Batista Luna</Text>
       </View>
 
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tabButton, selectedTab === 'Información' && styles.activeTab]}
-          onPress={() => setSelectedTab('Información')}
-        >
-          <Text style={[styles.tabText, selectedTab === 'Información' && styles.activeTabText]}>Información</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tabButton, selectedTab === 'Pedidos' && styles.activeTab]}
-          onPress={() => setSelectedTab('Pedidos')}
-        >
-          <Text style={[styles.tabText, selectedTab === 'Pedidos' && styles.activeTabText]}>Pedidos</Text>
-        </TouchableOpacity>
+      <View style={styles.cardContainer}>
+        <View style={styles.infoRow}>
+          <Ionicons name="mail-outline" size={20} color="#FFC107" style={styles.icon} />
+          <Text style={styles.detailText}>{email}</Text>
+        </View>
+        <View style={styles.divider} />
+        <View style={styles.infoRow}>
+          <Ionicons name="call-outline" size={20} color="#FFC107" style={styles.icon} />
+          <Text style={styles.detailText}>{phone}</Text>
+        </View>
       </View>
 
-      {selectedTab === 'Información' ? (
-        <View style={styles.detailsContainer}>
-          <Text style={styles.detailText}>laurabl@gmail.com</Text>
-          <Text style={styles.detailText}>614-123-2345</Text>
-          <Text style={styles.detailText}>Te uniste el: <Text style={styles.orangeText}>1/Mayo/2024</Text></Text>
-          <Text style={styles.detailText}>Total gastado: <Text style={styles.orangeText}>$368</Text></Text>
+      <TouchableOpacity style={styles.editButton} onPress={() => setEditInfoModalVisible(true)}>
+        <Text style={styles.editButtonText}>Editar Información</Text>
+      </TouchableOpacity>
 
-          {/* Additional Buttons */}
-          <TouchableOpacity style={styles.editButton}>
-            <Text style={styles.editButtonText}>Editar Información</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton} onPress={() => setChangePasswordModalVisible(true)}>
-            <Text style={styles.actionButtonText}>Cambiar contraseña</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton} onPress={() => setDeleteAccountModalVisible(true)}>
-            <Text style={styles.actionButtonText}>Eliminar cuenta</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton} onPress={logout}>
-            <Text style={styles.actionButtonText}>Cerrar Sesión</Text>
-          </TouchableOpacity>
+      <View style={styles.cardContainer}>
+        <Text style={styles.detailText}>Te uniste el: <Text style={styles.orangeText}>{joinDate}</Text></Text>
+        <View style={styles.divider} />
+        <Text style={styles.detailText}>Total gastado: <Text style={styles.orangeText}>{totalSpent}</Text></Text>
+      </View>
+
+      <View style={styles.divider} />
+
+      <TouchableOpacity style={styles.actionButton} onPress={() => setChangePasswordModalVisible(true)}>
+        <Text style={styles.actionButtonText}>Cambiar contraseña</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.actionButton} onPress={() => setDeleteAccountModalVisible(true)}>
+        <Text style={styles.actionButtonText}>Eliminar cuenta</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.actionButton} onPress={logout}>
+        <Text style={styles.actionButtonText}>Cerrar Sesión</Text>
+      </TouchableOpacity>
+
+      {/* Edit Information Modal */}
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={isEditInfoModalVisible}
+        onRequestClose={() => setEditInfoModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Editar Información</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Correo Electrónico"
+              value={email}
+              onChangeText={setEmail}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Teléfono"
+              value={phone}
+              onChangeText={setPhone}
+            />
+            <TouchableOpacity style={styles.modalButton} onPress={handleEditInfo}>
+              <Text style={styles.modalButtonText}>Guardar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalCancelButton} onPress={() => setEditInfoModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      ) : (
-        <ScrollView style={styles.ordersContainer}>
-          <View style={styles.orderSection}>
-            <Text style={styles.sectionTitle}>Pedido pendiente en:</Text>
-            <View style={styles.orderItem}>
-              <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.orderImage} />
-              <View>
-                <Text style={styles.orderLocation}>Cafeteria UTCH BIS</Text>
-                <Text style={styles.orderPrice}>$250</Text>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.orderSection}>
-            <Text style={styles.sectionTitle}>Historial de pedidos</Text>
-            <View style={styles.orderItem}>
-              <Image source={require('../assets/images/restaurantes/Dominos_Logo.png')} style={styles.orderImage} />
-              <View>
-                <Text style={styles.orderDate}>19/agosto/2023 10:59 am</Text>
-                <Text style={styles.orderTotal}>Total: $89</Text>
-              </View>
-            </View>
-            <View style={styles.orderItem}>
-              <Image source={require('../assets/images/restaurantes/PizzaHot_Logo.png')} style={styles.orderImage} />
-              <View>
-                <Text style={styles.orderDate}>19/agosto/2023 10:58 am</Text>
-                <Text style={styles.orderTotal}>Total: $28</Text>
-              </View>
-            </View>
-          </View>
-        </ScrollView>
-      )}
+      </Modal>
 
       {/* Change Password Modal */}
       <Modal
@@ -178,114 +185,90 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: 'white',
-    padding: 25,
   },
-  header: {
+  headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    backgroundColor: 'black',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   backButton: {
-    marginRight: 10,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
   },
-  backButtonText: {
-    fontSize: 24,
-    color: 'black',
-  },
-  title: {
+  headerText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFBF00',
+    color: 'white',
+    textAlign: 'center',
+    flex: 1,
   },
   profileContainer: {
     alignItems: 'center',
     marginVertical: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
   },
   image: {
     width: 100,
     height: 100,
     borderRadius: 50,
+    borderColor: '#FFA500',
+    borderWidth: 3,
   },
   userFullName: {
-    fontSize: 22,
+    fontSize: 25,
     fontWeight: 'bold',
     marginTop: 10,
-  },
-  tabContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  tabButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    marginHorizontal: 5,
-    backgroundColor: 'lightgray',
-  },
-  activeTab: {
-    backgroundColor: '#FFBF00',
-  },
-  tabText: {
-    fontSize: 16,
-    color: 'white',
-  },
-  activeTabText: {
-    color: 'white',
+    color: 'orange',
   },
   detailsContainer: {
+    paddingHorizontal: 20,
+  },
+  cardContainer: {
+    backgroundColor: '#F8F8F8',
+    borderColor: '#FFA500',
+    borderWidth: 1,
+    padding: 15,
+    marginBottom: 15,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 5,
+    width: '90%',
+    alignSelf: 'center',
+  },
+  infoRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 5,
+  },
+  icon: {
+    marginRight: 10,
   },
   detailText: {
     fontSize: 16,
-    marginVertical: 5,
     fontWeight: 'bold',
   },
   orangeText: {
     color: 'orange',
     fontWeight: 'bold',
   },
-  ordersContainer: {
-    flex: 1,
-  },
-  orderSection: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  orderItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  orderImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  orderLocation: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  orderPrice: {
-    fontSize: 16,
-    color: 'orange',
-  },
-  orderDate: {
-    fontSize: 16,
-  },
-  orderTotal: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  fBlack: {
-    width: 100,
-    height: 25,
-    marginBottom: 20,
-    marginTop: 25,
+  divider: {
+    height: 1,
+    backgroundColor: '#ccc',
+    marginVertical: 10,
   },
   editButton: {
     backgroundColor: '#000',
@@ -293,6 +276,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     marginVertical: 10,
+    width: '60%',
+    alignSelf: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
   },
   editButtonText: {
     color: '#fff',
@@ -305,6 +295,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     marginVertical: 5,
+    width: '60%',
+    alignSelf: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
   },
   actionButtonText: {
     fontSize: 16,

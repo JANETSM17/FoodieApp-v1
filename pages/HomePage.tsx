@@ -14,6 +14,7 @@ function HomePage() {
     const [isModalVisible, setModalVisible] = useState(false);
     const [comedorCode, setComedorCode] = useState('');
     const navigation = useNavigation();
+    const contentMargin = 20; 
 
     useEffect(() => {
         handleLoad();
@@ -40,12 +41,12 @@ function HomePage() {
 
     const handleRestaurantPress = async (comedorId) => {
         try {
-          await AsyncStorage.setItem('selectedComedorId', comedorId);
-          navigation.navigate('Menu');
+            await AsyncStorage.setItem('selectedComedorId', comedorId);
+            navigation.navigate('Menu');
         } catch (error) {
-          console.error('Error saving comedor ID:', error);
+            console.error('Error saving comedor ID:', error);
         }
-      };
+    };
 
     const handleBagPress = () => {
         navigation.navigate('Bolsa');
@@ -65,7 +66,7 @@ function HomePage() {
         if (result) {
             setComedorCode('');
             handleLoad();
-        }else{
+        } else {
             setComedorCode('');
             Alert.alert("Hubo un error, revisa que ingresaste el código correcto");
             setLoading(false);
@@ -100,6 +101,9 @@ function HomePage() {
                 <Image source={require('../assets/images/logos/FoodieOriginal.png')} style={styles.logo} />
             </View>
             <ScrollView contentContainerStyle={styles.contentContainer}>
+                <View style={styles.sectionTitleContainer}>
+                    <Text style={styles.sectionTitle}>Comedores</Text>
+                </View>
                 {comedores.length === 0 ? (
                     <View style={styles.noComedoresContainer}>
                         <Text>No tienes ningún comedor guardado</Text>
@@ -111,17 +115,17 @@ function HomePage() {
                             style={styles.comedorContainer}
                             onPress={() => handleRestaurantPress(comedor._id)}
                         >
-                            <TouchableOpacity onPress={() => handleDeleteComedor(comedor._id)}>
+                            <TouchableOpacity style={styles.closeButton} onPress={() => handleDeleteComedor(comedor._id)}>
                                 <Ionicons name="close" size={30} color="black" />
                             </TouchableOpacity>
                             <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.comedorImage} />
                             <View style={styles.comedorInfo}>
                                 <Text style={styles.comedorTitle}>{comedor.nombre}</Text>
                                 <Text style={styles.comedorRating}>
-                                <Ionicons name="star-outline" size={12} color="black" /> Calificación: <Text style={styles.boldText}>{comedor.calif}</Text>
+                                    <Ionicons name="star" size={18} color="#FFA500" /> <Text style={styles.boldText}>{comedor.calif}</Text>
                                 </Text>
                                 <Text style={styles.comedorWait}>
-                                <Ionicons name="time-outline" size={12} color="black" /> Tiempo de espera mínimo: <Text style={styles.boldText}>{comedor.min_espera} minutos</Text>
+                                    <Ionicons name="time" size={18} color="#FFA500" /> <Text style={styles.boldText}>{comedor.min_espera} minutos</Text>
                                 </Text>
                             </View>
                         </TouchableOpacity>
@@ -171,7 +175,7 @@ function HomePage() {
 }
 
 const styles = StyleSheet.create({
-    containerActivityIndicator:{
+    containerActivityIndicator: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
@@ -180,27 +184,40 @@ const styles = StyleSheet.create({
     },
     mainContainer: {
         flex: 1,
-        backgroundColor: '#F0F0F0',
+        backgroundColor: '#F8F8F8',
     },
     headerContainer: {
-        height: 80,
-        width: '100%',
-        backgroundColor: 'black',
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 20,
+        justifyContent: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        backgroundColor: 'black',
+        width: '100%',
     },
     logo: {
         width: 180,
         height: 45,
     },
     contentContainer: {
-        padding: 10,
+        padding: 20,
+    },
+    sectionTitleContainer: {
+        alignItems: 'center',
+        marginVertical: 20,
+        backgroundColor: '#FFA500',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 20,
+    },
+    sectionTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: 'white',
     },
     comedorContainer: {
         backgroundColor: '#FFFFFF',
-        borderColor: 'black',
+        borderColor: '#FFA500',
         borderWidth: 1,
         padding: 15,
         marginBottom: 15,
@@ -212,19 +229,20 @@ const styles = StyleSheet.create({
         elevation: 5,
         width: '90%',
         alignSelf: 'center',
-    },
-    comedorImage: {
-        width: '100%',
-        height: 120,
-        borderRadius: 10,
-        marginBottom: 10,
-        resizeMode: 'contain',
-    },
-    comedorInfo: {
+        flexDirection: 'row',
         alignItems: 'center',
     },
+    comedorImage: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        marginRight: 10,
+    },
+    comedorInfo: {
+        flex: 1,
+    },
     comedorTitle: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 5,
         color: 'black',
@@ -243,33 +261,10 @@ const styles = StyleSheet.create({
     boldText: {
         fontWeight: 'bold',
     },
-    roundButton: {
-        backgroundColor: 'black',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 50,
-        alignItems: 'center',
-        margin: 20,
-    },
-    buttonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    noComedoresContainer: {
-        backgroundColor: '#FFFFFF',
-        borderColor: 'black',
-        borderWidth: 1,
-        padding: 20,
-        marginBottom: 20,
-        borderRadius: 20,
-        shadowColor: '#000',
-        shadowOpacity: 0.2,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 5,
-        width: '90%',
-        alignSelf: 'center',
+    closeButton: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
     },
     navBar: {
         flexDirection: 'row',
@@ -317,7 +312,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginVertical: 10,
         width: '50%',
-      },
+    },
     addButton: {
         backgroundColor: '#FFA500',
         paddingVertical: 10,

@@ -80,9 +80,10 @@ const Bolsa = () => {
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="black" />
+          <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
-        <Text style={styles.header}>Bolsa</Text>
+        <Text style={styles.headerText}>Bolsa</Text>
+        <View style={{ width: 40 }}></View> {/* Placeholder for alignment */}
       </View>
       <ScrollView style={styles.scrollContainer} contentContainerStyle={{ paddingBottom: 100 }}>
         {items.map((item) => (
@@ -94,11 +95,11 @@ const Bolsa = () => {
               <Text style={styles.itemPrice}>${item.price}</Text>
               <View style={styles.itemActions}>
                 <TouchableOpacity style={styles.quantityButton} onPress={() => decrementQuantity(item.id)}>
-                  <Ionicons name="remove-circle" size={30} color="#FFC107" />
+                  <Ionicons name="remove-circle" size={30} color="#FFA500" />
                 </TouchableOpacity>
                 <Text style={styles.quantityNumber}>{item.quantity}</Text>
                 <TouchableOpacity style={styles.quantityButton} onPress={() => incrementQuantity(item.id)}>
-                  <Ionicons name="add-circle" size={30} color="#FFC107" />
+                  <Ionicons name="add-circle" size={30} color="#FFA500" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -134,20 +135,25 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    backgroundColor: 'black',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   backButton: {
-    marginRight: 10,
     width: 40,
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 20,
   },
-  header: {
+  headerText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#000',
+    color: 'white',
+    textAlign: 'center',
+    flex: 1,
   },
   itemContainer: {
     flexDirection: 'row',
@@ -161,6 +167,8 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 10,
+    borderColor: '#FFA500',
+    borderWidth: 1,
   },
   itemDetails: {
     flex: 1,
@@ -191,7 +199,6 @@ const styles = StyleSheet.create({
     height: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    
     borderRadius: 15,
   },
   quantityNumber: {
@@ -222,10 +229,11 @@ const styles = StyleSheet.create({
   },
   nextButton: {
     marginTop: 20,
-    marginBottom:10,
-    backgroundColor: '#FFC107',
+    marginBottom: 10,
+    backgroundColor: '#FFA500',
     paddingVertical: 15,
-    borderRadius: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
     alignItems: 'center',
     marginHorizontal: 20,
   },
