@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID } from '../services/demoService';
+import { getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito } from '../services/demoService';
 
 const RestaurantScreen = () => {
   const [selectedMenu, setSelectedMenu] = useState('Comida');
@@ -20,16 +20,32 @@ const RestaurantScreen = () => {
     Otros: [],
   });
 
-  const addToCart = (item) => {
-    console.log(carritoID);
-    Alert.alert('Producto agregado', `${item.nombre} ha sido agregado al carrito`);
+  const addToCart = async (item) => {
+    console.log('El id de carrito es: ', carrito);
+    console.log('El id del produccto es: ', item._id);
+    try {
+      if (carrito) {
+        const result = await confirmCarrito(item._id, carrito);
+        if (result.exists) {
+          console.log("Producto ya en el carrito")
+          Alert.alert('Producto ya en el carrito', `${item.nombre} ya está en el carrito, para modificar la cantidad ve a la bolsa`);
+        } else {
+          console.log("Producto agregado")
+          Alert.alert('Producto agregado', `${item.nombre} ha sido agregado al carrito, para modificar la cantidad ve a la bolsa`);
+          // Aquí agregarías el código para realmente agregar el producto al carrito
+        }
+      }
+    } catch (error) {
+      console.error('Error confirmando carrito:', error);
+      Alert.alert('Error', 'Hubo un problema al confirmar el carrito');
+    }
   };
 
   useEffect(() => {
-    handleLoadComedorData();
+    handleLoadData();
   }, []);
 
-  const handleLoadComedorData = async () => {
+  const handleLoadData = async () => {
     setLoading(true);
     try {
         const comedorId = await AsyncStorage.getItem('selectedComedorId');
@@ -39,6 +55,7 @@ const RestaurantScreen = () => {
             const carritoId = await getCarritoID(clientEmail);
             console.log('ID del carrito:', carritoId);
             setCarrito(carritoId);
+            await AsyncStorage.setItem('carritoID', carritoId);
             // Puedes guardar el carritoId en el estado si es necesario
 
             // Obtener información del comedor

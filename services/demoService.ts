@@ -303,4 +303,30 @@ async function getCarritoID(correo) {
   }
 }
 
-export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID };
+async function confirmCarrito(idProducto, idCarrito) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}confirmarCarrito/${idProducto}/${idCarrito}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error confirming cart");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error confirming cart:", error);
+    return { exists: false };
+  }
+}
+
+export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito };
