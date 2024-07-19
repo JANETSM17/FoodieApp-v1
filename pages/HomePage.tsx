@@ -10,7 +10,6 @@ function HomePage() {
     const { logout } = useAuth();
     const [loading, setLoading] = useState(true);
     const [comedores, setComedores] = useState([]);
-    const [cliente, setCliente] = useState(null);
     const [isModalVisible, setModalVisible] = useState(false);
     const [comedorCode, setComedorCode] = useState('');
     const navigation = useNavigation();
@@ -27,7 +26,8 @@ function HomePage() {
                 logout();
                 return;
             }
-            setCliente(clientInfo);
+
+            await AsyncStorage.setItem('clientEmail', clientInfo.correo);
 
             const comedoresData = await getComedores();
             setComedores(comedoresData);
@@ -87,11 +87,6 @@ function HomePage() {
                 <ActivityIndicator size="large" color="#F5B000" />
             </View>
         );
-    }
-
-    if (!cliente) {
-        logout();
-        return null;
     }
 
     return (

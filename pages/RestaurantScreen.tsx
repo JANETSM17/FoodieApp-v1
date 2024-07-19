@@ -3,12 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros } from '../services/demoService';
+import { getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID } from '../services/demoService';
 
 const RestaurantScreen = () => {
   const [selectedMenu, setSelectedMenu] = useState('Comida');
-  const [cart, setCart] = useState([]);
   const [comedor, setComedor] = useState(null);
+  const [carrito, setCarrito] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
@@ -21,9 +21,8 @@ const RestaurantScreen = () => {
   });
 
   const addToCart = (item) => {
-    setCart([...cart, item]);
+    console.log(carritoID);
     Alert.alert('Producto agregado', `${item.nombre} ha sido agregado al carrito`);
-    console.log(cart);
   };
 
   useEffect(() => {
@@ -33,25 +32,32 @@ const RestaurantScreen = () => {
   const handleLoadComedorData = async () => {
     setLoading(true);
     try {
-      const comedorId = await AsyncStorage.getItem('selectedComedorId');
-      if (comedorId) {
-        const comedorInfo = await getComedor(comedorId);
-        setComedor(comedorInfo);
-        setMenuItems({
-          Comida: await getComida(comedorId),
-          Bebidas: await getBebidas(comedorId),
-          Frituras: await getFrituras(comedorId),
-          Dulces: await getDulces(comedorId),
-          Otros: await getOtros(comedorId),
-        });
-        console.log(menuItems);
-      }
+        const comedorId = await AsyncStorage.getItem('selectedComedorId');
+        const clientEmail = await AsyncStorage.getItem('clientEmail');
+        if (comedorId && clientEmail) {
+            // Obtener ID del carrito
+            const carritoId = await getCarritoID(clientEmail);
+            console.log('ID del carrito:', carritoId);
+            setCarrito(carritoId);
+            // Puedes guardar el carritoId en el estado si es necesario
+
+            // Obtener información del comedor
+            const comedorInfo = await getComedor(comedorId);
+            setComedor(comedorInfo);
+            setMenuItems({
+                Comida: await getComida(comedorId),
+                Bebidas: await getBebidas(comedorId),
+                Frituras: await getFrituras(comedorId),
+                Dulces: await getDulces(comedorId),
+                Otros: await getOtros(comedorId),
+            });
+        }
     } catch (error) {
-      console.error("Error loading comedor data:", error);
+        console.error("Error loading comedor data:", error);
     } finally {
-      setLoading(false);
-  }
-  };
+        setLoading(false);
+    }
+};
 
   if (loading) {
     return (
