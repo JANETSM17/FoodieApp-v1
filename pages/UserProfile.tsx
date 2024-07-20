@@ -11,6 +11,7 @@ const UserProfile = () => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [deletePassword, setDeletePassword] = useState('');
+  const [nombre, setNombre] = useState('Laura Batista Luna');
   const [email, setEmail] = useState('laurabl@gmail.com');
   const [phone, setPhone] = useState('614-123-2345');
   const [joinDate] = useState('1/Mayo/2024');
@@ -45,7 +46,7 @@ const UserProfile = () => {
 
       <View style={styles.profileContainer}>
         <Image source={require('../assets/images/fotosCliente/FoxClient.jpeg')} style={styles.image} />
-        <Text style={styles.userFullName}>Laura Batista Luna</Text>
+        <Text style={styles.userFullName}>{nombre}</Text>
       </View>
 
       <View style={styles.cardContainer}>
@@ -95,6 +96,12 @@ const UserProfile = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Editar Información</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Nombre"
+              value={nombre}
+              onChangeText={setNombre}
+            />
             <TextInput
               style={styles.input}
               placeholder="Correo Electrónico"
