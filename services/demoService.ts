@@ -329,4 +329,30 @@ async function confirmCarrito(idProducto, idCarrito) {
   }
 }
 
-export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito };
+async function addToCarrito(idProducto, idCarrito) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}agregarCarrito/${idProducto}/${idCarrito}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error adding to cart");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    return { status: 'error', message: 'Ocurrió un error al agregar el producto al carrito.' };
+  }
+}
+
+export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito };

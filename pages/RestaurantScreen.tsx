@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito } from '../services/demoService';
+import { getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito } from '../services/demoService';
 
 const RestaurantScreen = () => {
   const [selectedMenu, setSelectedMenu] = useState('Comida');
@@ -22,24 +22,39 @@ const RestaurantScreen = () => {
 
   const addToCart = async (item) => {
     console.log('El id de carrito es: ', carrito);
-    console.log('El id del produccto es: ', item._id);
+    console.log('El id del producto es: ', item._id);
+    setLoading(true);
     try {
       if (carrito) {
+        // Confirmar si el producto ya está en el carrito y si se debe actualizar el proveedor
         const result = await confirmCarrito(item._id, carrito);
         if (result.exists) {
-          console.log("Producto ya en el carrito")
+          console.log("Producto ya en el carrito");
           Alert.alert('Producto ya en el carrito', `${item.nombre} ya está en el carrito, para modificar la cantidad ve a la bolsa`);
         } else {
-          console.log("Producto agregado")
-          Alert.alert('Producto agregado', `${item.nombre} ha sido agregado al carrito, para modificar la cantidad ve a la bolsa`);
-          // Aquí agregarías el código para realmente agregar el producto al carrito
+          // Agregar el producto al carrito
+          const addResult = await addToCarrito(item._id, carrito);
+          if (addResult.status === 'success') {
+            // Mostrar alerta de éxito
+            let message = `${item.nombre} ha sido agregado al carrito, para modificar la cantidad ve a la bolsa`;
+            if (addResult.dar_aviso) {
+              message += '\nEl producto que acabas de agregar le pertenece a un proveedor diferente que los productos que tenías en el carrito, por lo que el único producto en tu carrito será el que acabas de agregar. Recuerda que cada pedido debe de ser a un solo proveedor.';
+            }
+            Alert.alert('Producto agregado', message);
+          } else {
+            console.error('Error adding to cart:', addResult.message);
+            Alert.alert('Error', 'Hubo un problema al agregar el producto al carrito');
+          }
         }
       }
     } catch (error) {
       console.error('Error confirmando carrito:', error);
-      Alert.alert('Error', 'Hubo un problema al confirmar el carrito');
+      Alert.alert('Error', 'Hubo un problema al agregar el carrito');
+    }finally{
+      setLoading(false);
     }
-  };
+  };  
+  
 
   useEffect(() => {
     handleLoadData();
