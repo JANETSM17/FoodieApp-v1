@@ -18,13 +18,6 @@ const menuItems = [
     image: require('../assets/images/comida/pizza.png'),
     description: 'Pepperoni, queso mozarela...'
   },
-  {
-    id: '3',
-    name: 'Hamburguesa',
-    price: 10.00,
-    image: require('../assets/images/comida/hamburguesa.png'),
-    description: 'Carne de res, lechuga, tomate...'
-  },
 ];
 
 const MenuRestaurant = () => {

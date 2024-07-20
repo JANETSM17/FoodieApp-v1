@@ -28,11 +28,15 @@ function AuthProvider({ children }) {
 
   async function login(email, password) {
     setLoading(true);
-    const _user = await authService(email, password);
-    setUser(_user);
-    if (_user) {
-      await AsyncStorage.setItem("@authData", JSON.stringify(_user));
-      console.log({ _user });
+    //const _user = await authService(email, password);
+    //setUser(_user);
+    const response = await authService(email, password);
+    const { token, userType } = response;
+    setUser({ token });
+    if (token && userType) {
+      await AsyncStorage.setItem("@authData", JSON.stringify({ token }));
+      await AsyncStorage.setItem("@userType", userType);
+      console.log({ token, userType });
     }
     setLoading(false);
   }
@@ -41,6 +45,7 @@ function AuthProvider({ children }) {
     setLoading(true);
     setUser(undefined);
     await AsyncStorage.removeItem("@authData");
+    await AsyncStorage.removeItem("@userType");
     setLoading(false);
   }
 
