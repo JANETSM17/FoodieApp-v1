@@ -1,27 +1,79 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 import useAuth from '../hooks/useAuth'; 
+import { changePassword, getUserInfo } from '../services/demoService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UserProfile = () => {
+  const [loading, setLoading] = useState(true);
   const [isChangePasswordModalVisible, setChangePasswordModalVisible] = useState(false);
   const [isDeleteAccountModalVisible, setDeleteAccountModalVisible] = useState(false);
   const [isEditInfoModalVisible, setEditInfoModalVisible] = useState(false);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [deletePassword, setDeletePassword] = useState('');
-  const [nombre, setNombre] = useState('Laura Batista Luna');
-  const [email, setEmail] = useState('laurabl@gmail.com');
-  const [phone, setPhone] = useState('614-123-2345');
-  const [joinDate] = useState('1/Mayo/2024');
-  const [totalSpent] = useState('$368');
+  const [nombre, setNombre] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [image, setImage] = useState(''); //por ahora no la usamos hasta agregar cloudinary
+  const [joinDate, setJoinDate] = useState('');
+  const [id, setID] = useState('');
+  const [totalSpent, setTotalSpent] = useState('$368');
   const navigation = useNavigation();
   const { logout } = useAuth(); 
+  const [userType, setUserType] = useState('');
 
-  const handlePasswordChange = () => {
-    Alert.alert('Contraseña cambiada con éxito');
-    setChangePasswordModalVisible(false);
+  useEffect(() => {
+    handleLoad();
+  }, []);
+
+  const handleLoad = async () => {
+      setLoading(true);
+      try {
+          const clientInfo = await getUserInfo();
+          if (clientInfo) {
+              setEmail(clientInfo.correo);
+              setNombre(clientInfo.nombre);
+              setPhone(clientInfo.telefono);
+              setImage(clientInfo.imagen);
+              setID(clientInfo._id)
+              const fechaOrg = new Date(clientInfo.created_at)
+              const dia = fechaOrg.getDate()
+              const mes = fechaOrg.getMonth()+1
+              const año = fechaOrg.getFullYear()
+              setJoinDate(`${año}/${mes}/${dia}`);
+          }
+            setUserType('clientes');
+
+      } catch (error) {
+          console.error('Error fetching data:', error);
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  const handlePasswordChange = async () => {
+    console.log('Current password: ', oldPassword);
+    console.log('New password: ', newPassword);
+    console.log('UserType: ', userType);
+    console.log('ID: ', id);
+    setLoading(true);
+        try {
+            const changed = await changePassword(oldPassword, newPassword, userType, id);
+            if (changed.status === 'success') {
+              Alert.alert('Contraseña cambiada con éxito');
+            }
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            Alert.alert('Error al cambiar contraseña');
+        } finally {
+            setChangePasswordModalVisible(false);
+            setLoading(false);
+        }
+    
   };
 
   const handleDeleteAccount = () => {
@@ -33,6 +85,14 @@ const UserProfile = () => {
     Alert.alert('Información editada con éxito');
     setEditInfoModalVisible(false);
   };
+
+  if (loading) {
+    return (
+        <View style={styles.containerActivityIndicator}>
+            <ActivityIndicator size="large" color="#F5B000" />
+        </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.mainContainer}>
@@ -190,6 +250,13 @@ const UserProfile = () => {
 };
 
 const styles = StyleSheet.create({
+  containerActivityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F0F0F0',
+    padding: 20,
+  },
   mainContainer: {
     flex: 1,
     backgroundColor: 'white',

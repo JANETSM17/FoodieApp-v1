@@ -355,4 +355,30 @@ async function addToCarrito(idProducto, idCarrito) {
   }
 }
 
-export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito };
+async function changePassword(previousPass, newPass, userType, id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}changePassword/${previousPass}/${newPass}/${userType}/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error changing password");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error changing password:", error);
+    return { exists: false };
+  }
+}
+
+export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword };

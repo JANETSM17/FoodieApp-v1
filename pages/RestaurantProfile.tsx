@@ -8,6 +8,8 @@ import Header2 from '../components/Header2';
 const RestaurantProfile = () => {
   const [selectedTab, setSelectedTab] = useState('Información');
   const [isToggleOn, setIsToggleOn] = useState(true);
+  const [name, setName] = useState('Wendys');
+  const [code, setComedorCode] = useState('AS98DF2');
   const [email, setEmail] = useState('wendys@foodie.com');
   const [phone, setPhone] = useState('614-123-2345');
   const [address, setAddress] = useState('Calle Marciano #114 Col. IV');
@@ -33,8 +35,8 @@ const RestaurantProfile = () => {
       </View>
 
       <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.restaurantImage} />
-      <Text style={styles.restaurantName}>Wendys</Text>
-      <Text style={styles.restaurantCode}>AS98DF2</Text>
+      <Text style={styles.restaurantName}>{name}</Text>
+      <Text style={styles.restaurantCode}>{code}</Text>
 
       <View style={styles.toggleButtons}>
         <TouchableOpacity style={[styles.toggleButton, selectedTab === 'Información' && styles.selectedTab]} onPress={() => setSelectedTab('Información')}>
