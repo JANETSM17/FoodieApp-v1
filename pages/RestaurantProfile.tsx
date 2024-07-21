@@ -1,13 +1,17 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native';
-import React, { useState } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal, TextInput, Switch, Alert, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 import useAuth from '../hooks/useAuth'; 
+import { changePassword, getUserInfo, deleteAccount } from '../services/demoService';
 import Header2 from '../components/Header2'; 
 
 const RestaurantProfile = () => {
+  const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState('Información');
   const [isToggleOn, setIsToggleOn] = useState(true);
+  const [isChangePasswordModalVisible, setChangePasswordModalVisible] = useState(false);
+  const [isDeleteAccountModalVisible, setDeleteAccountModalVisible] = useState(false);
   const [name, setName] = useState('Wendys');
   const [code, setComedorCode] = useState('AS98DF2');
   const [email, setEmail] = useState('wendys@foodie.com');
@@ -20,9 +24,85 @@ const RestaurantProfile = () => {
   const [isFaqVisible, setIsFaqVisible] = useState(false);
   const navigation = useNavigation();
   const { logout } = useAuth();
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
+  const [id, setID] = useState('');
+  const [userType, setUserType] = useState('');
 
   const handleToggleChange = () => setIsToggleOn(previousState => !previousState);
   const toggleFaqVisibility = () => setIsFaqVisible(!isFaqVisible);
+
+  useEffect(() => {
+    handleLoad();
+  }, []);
+
+  const handleLoad = async () => {
+      setLoading(true);
+      try {
+          const clientInfo = await getUserInfo();
+          if (clientInfo) {
+              setEmail(clientInfo.correo);
+              setName(clientInfo.nombre);
+              setPhone(clientInfo.telefono);
+              setAddress(clientInfo.direccion);
+              setRating(`${clientInfo.calif}/5`);
+              setPrepTime(clientInfo.min_espera);
+              setComedorCode(clientInfo.clave)
+              setID(clientInfo._id)
+          }
+            setUserType('proveedores');
+
+      } catch (error) {
+          console.error('Error fetching data:', error);
+      } finally {
+          setLoading(false);
+      }
+  };
+
+  const handlePasswordChange = async () => {
+    setLoading(true);
+        try {
+            const changed = await changePassword(oldPassword, newPassword, userType, id);
+            if (changed.status === 'success') {
+              Alert.alert('Contraseña cambiada con éxito');
+            }
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            Alert.alert('Error al cambiar contraseña');
+        } finally {
+            setChangePasswordModalVisible(false);
+            setLoading(false);
+        }
+  };
+
+  const handleDeleteAccount = async () => {
+    console.log(deletePassword);
+    console.log(id);
+    console.log(userType);
+    setLoading(true);
+        try {
+            const deleted = await deleteAccount(deletePassword, id , userType);
+            if (deleted.status === 'success') {
+              logout()
+              setLoading(false);
+              Alert.alert('Cuenta eliminada con éxito');
+            }
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            Alert.alert('Error al eliminar cuenta');
+        } 
+  };
+
+  if (loading) {
+    return (
+        <View style={styles.containerActivityIndicator}>
+            <ActivityIndicator size="large" color="#F5B000" />
+        </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -136,10 +216,10 @@ const RestaurantProfile = () => {
             )}
           </View>
 
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity style={styles.actionButton} onPress={() => setChangePasswordModalVisible(true)}>
             <Text style={styles.actionButtonText}>Cambiar contraseña</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity style={styles.actionButton} onPress={() => setDeleteAccountModalVisible(true)}>
             <Text style={styles.actionButtonText}>Eliminar cuenta</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton} onPress={logout}>
@@ -190,6 +270,67 @@ const RestaurantProfile = () => {
           </View>
         </View>
       )}
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={isChangePasswordModalVisible}
+        onRequestClose={() => setChangePasswordModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Cambiar Contraseña</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Contraseña Actual"
+              secureTextEntry={true}
+              value={oldPassword}
+              onChangeText={setOldPassword}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Nueva Contraseña"
+              secureTextEntry={true}
+              value={newPassword}
+              onChangeText={setNewPassword}
+            />
+            <TouchableOpacity style={styles.modalButton} onPress={handlePasswordChange}>
+              <Text style={styles.modalButtonText}>Confirmar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalCancelButton} onPress={() => setChangePasswordModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={isDeleteAccountModalVisible}
+        onRequestClose={() => setDeleteAccountModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalWarningTitle}>¡Cuidado!</Text>
+            <Text style={styles.modalWarningText}>
+              Estás a punto de eliminar tu cuenta. Una vez eliminada tu cuenta NO PODRAS RECUPERARLA, todo será eliminado de forma permanente.
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Contraseña"
+              secureTextEntry={true}
+              value={deletePassword}
+              onChangeText={setDeletePassword}
+            />
+            <TouchableOpacity style={styles.modalButton} onPress={handleDeleteAccount}>
+              <Text style={styles.modalButtonText}>Confirmar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalCancelButton} onPress={() => setDeleteAccountModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -197,10 +338,16 @@ const RestaurantProfile = () => {
 export default RestaurantProfile;
 
 const styles = StyleSheet.create({
+  containerActivityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F0F0F0',
+    padding: 20,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 25,
+    backgroundColor: 'white',
   },
   headerContainer: {
     flexDirection: 'row',
@@ -210,6 +357,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
     justifyContent: 'space-between',
     width: '100%',
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
   },
   logo: {
     width: 180,
@@ -277,6 +431,7 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 16,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   divider: {
     height: 1,
@@ -308,6 +463,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    textAlign: 'center',
   },
   actionButton: {
     backgroundColor: '#ffc107',
@@ -404,5 +560,63 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  modalButton: {
+    backgroundColor: 'orange',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+  modalCancelButton: {
+    backgroundColor: '#aaa',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalWarningTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    color: 'red',
+  },
+  modalWarningText: {
+    fontSize: 16,
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  input: {
+    width: '100%',
+    padding: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 10,
   },
 });

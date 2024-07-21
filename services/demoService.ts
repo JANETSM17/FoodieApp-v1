@@ -381,4 +381,30 @@ async function changePassword(previousPass, newPass, userType, id) {
   }
 }
 
-export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword };
+async function deleteAccount(password, id , userType) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}deleteAccount/${password}/${id}/${userType}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error eliminando cuenta");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    return { exists: false };
+  }
+}
+
+export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword, deleteAccount };

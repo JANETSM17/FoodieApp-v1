@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, Tex
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 import useAuth from '../hooks/useAuth'; 
-import { changePassword, getUserInfo } from '../services/demoService';
+import { changePassword, getUserInfo, deleteAccount } from '../services/demoService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UserProfile = () => {
@@ -43,7 +43,7 @@ const UserProfile = () => {
               const dia = fechaOrg.getDate()
               const mes = fechaOrg.getMonth()+1
               const año = fechaOrg.getFullYear()
-              setJoinDate(`${año}/${mes}/${dia}`);
+              setJoinDate(`${año} / ${mes} / ${dia}`);
           }
             setUserType('clientes');
 
@@ -55,10 +55,6 @@ const UserProfile = () => {
   };
 
   const handlePasswordChange = async () => {
-    console.log('Current password: ', oldPassword);
-    console.log('New password: ', newPassword);
-    console.log('UserType: ', userType);
-    console.log('ID: ', id);
     setLoading(true);
         try {
             const changed = await changePassword(oldPassword, newPassword, userType, id);
@@ -76,9 +72,23 @@ const UserProfile = () => {
     
   };
 
-  const handleDeleteAccount = () => {
-    Alert.alert('Cuenta eliminada con éxito');
-    setDeleteAccountModalVisible(false);
+  const handleDeleteAccount = async () => {
+    console.log(deletePassword);
+    console.log(id);
+    console.log(userType);
+    setLoading(true);
+        try {
+            const deleted = await deleteAccount(deletePassword, id , userType);
+            if (deleted.status === 'success') {
+              logout()
+              setLoading(false);
+              Alert.alert('Cuenta eliminada con éxito');
+            }
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            Alert.alert('Error al eliminar cuenta');
+        } 
   };
 
   const handleEditInfo = () => {
@@ -134,8 +144,6 @@ const UserProfile = () => {
           Total gastado: <Text style={styles.orangeText}>{totalSpent}</Text>
         </Text>
       </View>
-
-      <View style={styles.divider} />
 
       <TouchableOpacity style={styles.actionButton} onPress={() => setChangePasswordModalVisible(true)}>
         <Text style={styles.actionButtonText}>Cambiar contraseña</Text>
