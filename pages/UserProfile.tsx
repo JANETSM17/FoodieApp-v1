@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import useAuth from '../hooks/useAuth'; 
 import { changePassword, getUserInfo, deleteAccount } from '../services/demoService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UserProfile = () => {
   const [loading, setLoading] = useState(true);
@@ -169,12 +168,6 @@ const UserProfile = () => {
               placeholder="Nombre"
               value={nombre}
               onChangeText={setNombre}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Correo Electrónico"
-              value={email}
-              onChangeText={setEmail}
             />
             <TextInput
               style={styles.input}

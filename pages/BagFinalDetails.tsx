@@ -28,7 +28,7 @@ const BagFinalDetails = () => {
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Detalles</Text>
-        <View style={{ width: 40 }}></View> {/* Placeholder for alignment */}
+        <View style={styles.placeholder} />
       </View>
 
       <Text style={styles.chooseText}>Selecciona como lo quieres!</Text>
@@ -148,6 +148,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     flex: 1,
   },
+  placeholder: {
+    width: 40,
+  },
   chooseText: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -175,6 +178,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     marginBottom: 5,
+    resizeMode: 'contain',
   },
   optionText: {
     fontSize: 16,

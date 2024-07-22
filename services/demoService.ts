@@ -407,4 +407,82 @@ async function deleteAccount(password, id , userType) {
   }
 }
 
-export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword, deleteAccount };
+async function getProductos(idCarrito) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}getProductos/${idCarrito}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error adding to cart");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    return { status: 'error', message: 'Ocurrió un error al agregar el producto al carrito.' };
+  }
+}
+
+async function deleteProducto(idProducto, idCarrito) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}deleteProducto/${idProducto}/${idCarrito}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error deleting product");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    return { status: 'error', message: 'Ocurrió un error al eliminar el producto del carrito.' };
+  }
+}
+
+async function modifyQuantityProducto(idProducto, idCarrito, cantidad) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}modifyQuantityProducto/${idProducto}/${idCarrito}/${cantidad}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error updating product");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error updating quantity of product:", error);
+    return { status: 'error', message: 'Ocurrió un error al modifical la cantidad del producto en el carrito.' };
+  }
+}
+
+export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword, deleteAccount, getProductos, deleteProducto, modifyQuantityProducto };

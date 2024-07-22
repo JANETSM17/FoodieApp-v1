@@ -1,80 +1,118 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-
-const initialItems = [
-  {
-    id: '1',
-    name: 'Burrito de Asado',
-    price: 8.00,
-    image: require('../assets/images/comida/burrito.png'),
-    description: 'Asado rojo, ...',
-    quantity: 1
-  },
-  {
-    id: '2',
-    name: 'Pizza Italiana',
-    price: 15.00,
-    image: require('../assets/images/comida/pizza.png'),
-    description: 'Pepperoni, queso mozarela...',
-    quantity: 1
-  },
-  {
-    id: '3',
-    name: 'Burrito de Picadillo',
-    price: 7.00,
-    image: require('../assets/images/comida/burrito.png'),
-    description: 'Picadillo de res, ...',
-    quantity: 1
-  },
-  {
-    id: '4',
-    name: 'Burrito de Discada',
-    price: 9.00,
-    image: require('../assets/images/comida/burrito.png'),
-    description: 'Discada mixta, ...',
-    quantity: 1
-  },
-  {
-    id: '5',
-    name: 'Pizza Vegetariana',
-    price: 12.00,
-    image: require('../assets/images/comida/pizza.png'),
-    description: 'Pimientos, champiñones, cebolla...',
-    quantity: 1
-  },
-  {
-    id: '6',
-    name: 'Pizza de Pollo',
-    price: 14.00,
-    image: require('../assets/images/comida/pizza.png'),
-    description: 'Pollo, queso mozarela, salsa BBQ...',
-    quantity: 1
-  }
-];
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { deleteProducto, getProductos, modifyQuantityProducto } from '../services/demoService';
 
 const Bolsa = () => {
-  const [items, setItems] = useState(initialItems);
+  const [items, setItems] = useState([]);
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(true);
+  const [carrito, setCarrito] = useState('');
 
-  const deleteItem = (id) => {
-    setItems(items.filter(item => item.id !== id));
+  useEffect(() => {
+    handleLoad();
+}, []);
+
+const handleLoad = async () => {
+    setLoading(true);
+    try {
+      const carritoID = await AsyncStorage.getItem('carritoID');
+      if(carritoID){
+        setCarrito(carritoID);
+        const productosEnBag = await getProductos(carritoID)
+        if(productosEnBag){
+          console.log('Esto hay en bag: ', productosEnBag)
+          setItems(productosEnBag);
+        }
+      }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    } finally {
+        setLoading(false);
+    }
+};
+
+  const deleteItem = async (id) => {
+    console.log(id);
+    console.log(carrito);
+    setLoading(true)
+    try {
+      const deleted = await deleteProducto(id, carrito)
+      if(deleted.status === 'success'){
+        console.log('Producto eliminado')
+      }
+      
+    } catch (error) {
+      console.error('Error eliminando producto:', error);
+    }finally{
+      handleLoad()
+    }
   };
 
-  const incrementQuantity = (id) => {
-    setItems(items.map(item => item.id === id ? { ...item, quantity: item.quantity + 1 } : item));
+  const incrementQuantity = async (id) => {
+    const updatedItems = items.map(item => 
+      item._id === id ? { ...item, cantidad: item.cantidad + 1 } : item
+    );
+  
+    // Encuentra el ítem actualizado para obtener la nueva cantidad
+    const updatedItem = updatedItems.find(item => item._id === id);
+    const nuevaCantidad = updatedItem.cantidad;
+
+    console.log('Esta es la cantidad que pasamos: ', nuevaCantidad)
+    console.log(id)
+    console.log(carrito)
+
+    setLoading(true)
+    try {
+      const changed = await modifyQuantityProducto(id, carrito, nuevaCantidad)
+      if(changed.status === 'success'){
+        console.log('Producto aumentado')
+      }
+    } catch (error) {
+      console.error('Error aumentando cantidad producto:', error);
+    }finally{
+      handleLoad()
+    }
   };
 
-  const decrementQuantity = (id) => {
-    setItems(items.map(item => 
-      item.id === id && item.quantity > 1 ? { ...item, quantity: item.quantity - 1 } : item
-    ));
+  const decrementQuantity = async (id) => {
+    //setItems(items.map(item => item._id === id && item.cantidad > 1 ? { ...item, cantidad: item.cantidad - 1 } : item));
+    const updatedItems = items.map(item => item._id === id && item.cantidad > 1 ? { ...item, cantidad: item.cantidad - 1 } : item)
+  
+    // Encuentra el ítem actualizado para obtener la nueva cantidad
+    const updatedItem = updatedItems.find(item => item._id === id);
+    const nuevaCantidad = updatedItem.cantidad;
+
+    console.log('Esta es la cantidad que pasamos: ', nuevaCantidad)
+    console.log(id)
+    console.log(carrito)
+
+    setLoading(true)
+    try {
+      const changed = await modifyQuantityProducto(id, carrito, nuevaCantidad)
+      if(changed.status === 'success'){
+        console.log('Producto disminuido')
+      }
+    } catch (error) {
+      console.error('Error disminuyendo cantidad producto:', error);
+    }finally{
+      handleLoad()
+    }
   };
 
   const calculateTotal = () => {
-    return items.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
+    return items.reduce((total, item) => total + (item.precio * item.cantidad), 0).toFixed(2);
   };
+
+  if (loading) {
+    return (
+        <View style={styles.containerActivityIndicator}>
+            <ActivityIndicator size="large" color="#F5B000" />
+        </View>
+    );
+}
 
   return (
     <View style={styles.container}>
@@ -87,23 +125,22 @@ const Bolsa = () => {
       </View>
       <ScrollView style={styles.scrollContainer} contentContainerStyle={{ paddingBottom: 100 }}>
         {items.map((item) => (
-          <View key={item.id} style={styles.itemContainer}>
-            <Image source={item.image} style={styles.itemImage} />
+          <View key={item._id} style={styles.itemContainer}>
+            <Image source={require('../assets/images/comida/burrito.png')} style={styles.itemImage} />
             <View style={styles.itemDetails}>
-              <Text style={styles.itemName}>{item.name}</Text>
-              <Text style={styles.itemDescription}>{item.description}</Text>
-              <Text style={styles.itemPrice}>${item.price}</Text>
+              <Text style={styles.itemName}>{item.nombre}</Text>
+              <Text style={styles.itemPrice}>${item.precio}</Text>
               <View style={styles.itemActions}>
-                <TouchableOpacity style={styles.quantityButton} onPress={() => decrementQuantity(item.id)}>
+                <TouchableOpacity style={styles.quantityButton} onPress={() => decrementQuantity(item._id)}>
                   <Ionicons name="remove-circle" size={30} color="#FFA500" />
                 </TouchableOpacity>
-                <Text style={styles.quantityNumber}>{item.quantity}</Text>
-                <TouchableOpacity style={styles.quantityButton} onPress={() => incrementQuantity(item.id)}>
+                <Text style={styles.quantityNumber}>{item.cantidad}</Text>
+                <TouchableOpacity style={styles.quantityButton} onPress={() => incrementQuantity(item._id)}>
                   <Ionicons name="add-circle" size={30} color="#FFA500" />
                 </TouchableOpacity>
               </View>
             </View>
-            <TouchableOpacity style={styles.deleteButton} onPress={() => deleteItem(item.id)}>
+            <TouchableOpacity style={styles.deleteButton} onPress={() => deleteItem(item._id)}>
               <Ionicons name="trash-outline" size={25} color="#f00" />
             </TouchableOpacity>
           </View>
@@ -124,6 +161,13 @@ const Bolsa = () => {
 };
 
 const styles = StyleSheet.create({
+  containerActivityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F0F0F0',
+    padding: 20,
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
