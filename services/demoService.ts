@@ -485,4 +485,30 @@ async function modifyQuantityProducto(idProducto, idCarrito, cantidad) {
   }
 }
 
-export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword, deleteAccount, getProductos, deleteProducto, modifyQuantityProducto };
+async function editInfoClient(nombre, telefono, userType, id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}editInfoClient/${nombre}/${telefono}/${userType}/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error changing info");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error changing info:", error);
+    return { exists: false };
+  }
+}
+
+export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword, deleteAccount, getProductos, deleteProducto, modifyQuantityProducto,editInfoClient };

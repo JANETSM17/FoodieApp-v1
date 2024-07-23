@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, Tex
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 import useAuth from '../hooks/useAuth'; 
-import { changePassword, getUserInfo, deleteAccount } from '../services/demoService';
+import { changePassword, getUserInfo, deleteAccount, editInfoClient } from '../services/demoService';
 
 const UserProfile = () => {
   const [loading, setLoading] = useState(true);
@@ -90,9 +90,22 @@ const UserProfile = () => {
         } 
   };
 
-  const handleEditInfo = () => {
-    Alert.alert('Información editada con éxito');
-    setEditInfoModalVisible(false);
+  const handleEditInfo = async () => {
+    setLoading(true);
+        try {
+            const changed = await editInfoClient(nombre, phone, userType, id);
+            if (changed.status === 'success') {
+              Alert.alert('Información actualizada con éxito');
+            }
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            Alert.alert('Error al actualizar información');
+        } finally {
+            setEditInfoModalVisible(false);
+            setLoading(false);
+        }
+    
   };
 
   if (loading) {
