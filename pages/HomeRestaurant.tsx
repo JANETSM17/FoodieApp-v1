@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
@@ -18,7 +18,7 @@ const ordersInProgress = [
     total: 250,
     pickupTime: '11:59 am',
     deliveryType: 'Foodie-Box',
-    status: 'Listo'
+    status: 'Solicitud Enviada'
   },
   {
     id: 2,
@@ -34,7 +34,7 @@ const ordersInProgress = [
     total: 250,
     pickupTime: '11:59 am',
     deliveryType: 'Pick-Up',
-    status: 'No Listo'
+    status: 'Preparando'
   },
   {
     id: 3,
@@ -50,7 +50,7 @@ const ordersInProgress = [
     total: 250,
     pickupTime: '11:59 am',
     deliveryType: 'Foodie-Box',
-    status: 'Listo'
+    status: 'Listo para recoger'
   },
 ];
 
@@ -68,7 +68,7 @@ const ordersReady = [
     specifications: 'Sin especificaciones',
     total: 250,
     pickupTime: '11:59 am',
-    status: 'Entregado',
+    status: 'Listo para recoger',
     deliveryType: 'Foodie-Box'
   },
   {
@@ -84,7 +84,7 @@ const ordersReady = [
     specifications: 'Sin especificaciones',
     total: 250,
     pickupTime: '11:59 am',
-    status: 'Entregado',
+    status: 'Listo para recoger',
     deliveryType: 'Pick-Up'
   },
   {
@@ -100,7 +100,7 @@ const ordersReady = [
     specifications: 'Sin especificaciones',
     total: 250,
     pickupTime: '11:59 am',
-    status: 'Entregado',
+    status: 'Listo para recoger',
     deliveryType: 'Foodie-Box'
   },
 ];
@@ -110,11 +110,9 @@ const HomeRestaurant = () => {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [isAddProductModalVisible, setAddProductModalVisible] = useState(false);
-  const [productName, setProductName] = useState('');
-  const [productPrice, setProductPrice] = useState('');
-  const [productDescription, setProductDescription] = useState('');
-  const [productCategory, setProductCategory] = useState('');
+  const [statusModalVisible, setStatusModalVisible] = useState(false);
+  const [orders, setOrders] = useState(ordersInProgress);
+
   const navigation = useNavigation();
 
   const renderOrders = (orders) => {
@@ -130,7 +128,18 @@ const HomeRestaurant = () => {
         </View>
         <Text style={styles.totalText}>Total: <Text style={styles.boldText}>${order.total}</Text></Text>
         <Text style={styles.pickupTimeText}>Hora de Pick-up: {order.pickupTime}</Text>
-        <Text style={styles.pickupStatusText}>Estado: <Text style={styles.boldText}>{order.status}</Text></Text>
+        {selectedTab === 'InProgress' ? (
+          <TouchableOpacity style={styles.statusButton} onPress={() => handleStatusPress(order)}>
+            <Text style={styles.statusButtonText}>{order.status}</Text>
+          </TouchableOpacity>
+        ) : (
+          <>
+            <Text style={styles.statusReadyText}>{order.status}</Text>
+            <TouchableOpacity style={styles.sendButton}>
+              <Text style={styles.sendButtonText}>Enviar</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </TouchableOpacity>
     ));
   };
@@ -146,31 +155,28 @@ const HomeRestaurant = () => {
   };
 
   const handleCancelOrder = () => {
-    // Aquí puedes manejar la lógica de cancelación del pedido
     setModalVisible(false);
   };
 
-  const handleAddProductPress = () => {
-    setAddProductModalVisible(true);
+  const handleStatusPress = (order) => {
+    setSelectedOrder(order);
+    setStatusModalVisible(true);
   };
 
-  const handleCloseAddProductModal = () => {
-    setAddProductModalVisible(false);
-    setProductName('');
-    setProductPrice('');
-    setProductDescription('');
-    setProductCategory('');
-  };
-
-  const handleAddProduct = () => {
-    // Lógica para agregar un producto
-    setAddProductModalVisible(false);
+  const handleStatusChange = (status) => {
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === selectedOrder.id ? { ...order, status: status } : order
+      )
+    );
+    setStatusModalVisible(false);
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Image source={require('../assets/images/logos/FoodieOriginal.png')} style={styles.logo} />
+        <View style={{ width: 40 }} />
       </View>
       <View style={styles.tabContainer}>
         <TouchableOpacity style={[styles.tabButton, selectedTab === 'InProgress' && styles.activeTab]} onPress={() => setSelectedTab('InProgress')}>
@@ -192,7 +198,7 @@ const HomeRestaurant = () => {
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.content}>
-        {selectedTab === 'InProgress' && renderOrders(ordersInProgress)}
+        {selectedTab === 'InProgress' && renderOrders(orders)}
         {selectedTab === 'Ready' && renderOrders(ordersReady)}
       </ScrollView>
       {selectedOrder && (
@@ -223,62 +229,44 @@ const HomeRestaurant = () => {
           </View>
         </Modal>
       )}
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={statusModalVisible}
+        onRequestClose={() => setStatusModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Cambiar Estado</Text>
+            <TouchableOpacity style={styles.statusOption} onPress={() => handleStatusChange('Solicitud Enviada')}>
+              <Text style={styles.statusOptionText}>Solicitud Enviada</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.statusOption} onPress={() => handleStatusChange('Preparando')}>
+              <Text style={styles.statusOptionText}>Preparando</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.statusOption} onPress={() => handleStatusChange('Listo para recoger')}>
+              <Text style={styles.statusOptionText}>Listo para recoger</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalButtonCancel} onPress={() => setStatusModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Cancelar pedido</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.navBar}>
         <TouchableOpacity onPress={() => navigation.navigate('MenuRestaurant')} style={styles.navButton}>
           <Ionicons name="restaurant-outline" size={30} color="#FFFFFF" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleAddProductPress} style={styles.navButton}>
+        <TouchableOpacity onPress={() => {}} style={styles.navButton}>
           <Ionicons name="add-circle-outline" size={30} color="#FFA500" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('HistorialRestaurant')} style={styles.navButton}>
+          <Ionicons name="time-outline" size={30} color="#FFFFFF" />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('RestaurantProfile')} style={styles.navButton}>
           <Ionicons name="person-outline" size={30} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
-      <Modal
-        transparent={true}
-        animationType="slide"
-        visible={isAddProductModalVisible}
-        onRequestClose={handleCloseAddProductModal}
-      >
-        <View style={styles.addProductModalContainer}>
-          <View style={styles.addProductModalContent}>
-            <Text style={styles.addProductModalTitle}>Agregar producto</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Nombre del producto"
-              value={productName}
-              onChangeText={setProductName}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Precio del producto"
-              value={productPrice}
-              onChangeText={setProductPrice}
-              keyboardType="numeric"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Descripción del producto"
-              value={productDescription}
-              onChangeText={setProductDescription}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Categoría"
-              value={productCategory}
-              onChangeText={setProductCategory}
-            />
-            <View style={styles.addProductModalButtonsContainer}>
-              <TouchableOpacity style={styles.addProductModalButton} onPress={handleAddProduct}>
-                <Text style={styles.addProductModalButtonText}>Agregar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.addProductModalButtonCancel} onPress={handleCloseAddProductModal}>
-                <Text style={styles.addProductModalButtonText}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };
@@ -392,11 +380,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 5,
   },
-  pickupStatusText: {
+  statusButton: {
+    backgroundColor: 'black',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  statusButtonText: {
+    color: 'white',
     fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 5,
+  },
+  statusReadyText: {
+    fontSize: 14,
+    fontWeight: 'bold',
     color: '#FFA500',
+  },
+  sendButton: {
+    backgroundColor: '#FFA500',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  sendButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   modalContainer: {
     flex: 1,
@@ -405,16 +417,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: 300,
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     borderRadius: 10,
-    alignItems: 'center',
     padding: 20,
+    width: '80%',
+    alignItems: 'center',
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 15,
   },
   modalText: {
     fontSize: 16,
@@ -448,6 +460,19 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+  statusOption: {
+    backgroundColor: '#FFA500',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    alignItems: 'center',
+    marginBottom: 10,
+    width: '100%',
+  },
+  statusOptionText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
   navBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -459,56 +484,5 @@ const styles = StyleSheet.create({
   },
   navButton: {
     alignItems: 'center',
-  },
-  addProductModalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  addProductModalContent: {
-    width: 300,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    alignItems: 'center',
-    padding: 20,
-  },
-  addProductModalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  input: {
-    width: '100%',
-    padding: 10,
-    marginVertical: 10,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 10,
-    textAlign: 'center',
-  },
-  addProductModalButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginTop: 20,
-  },
-  addProductModalButton: {
-    backgroundColor: '#FFA500',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    alignItems: 'center',
-  },
-  addProductModalButtonCancel: {
-    backgroundColor: '#FF0000',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    alignItems: 'center',
-  },
-  addProductModalButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
 });

@@ -1,17 +1,17 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal, TextInput, Switch, Alert, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal, TextInput, Alert, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 import useAuth from '../hooks/useAuth'; 
-import { changePassword, getUserInfo, deleteAccount } from '../services/demoService';
-import Header2 from '../components/Header2'; 
+import { changePassword, getUserInfo, deleteAccount, editInfoClient } from '../services/demoService';
 
 const RestaurantProfile = () => {
   const [loading, setLoading] = useState(true);
-  const [selectedTab, setSelectedTab] = useState('Información');
-  const [isToggleOn, setIsToggleOn] = useState(true);
   const [isChangePasswordModalVisible, setChangePasswordModalVisible] = useState(false);
   const [isDeleteAccountModalVisible, setDeleteAccountModalVisible] = useState(false);
+  const [isEditInfoModalVisible, setEditInfoModalVisible] = useState(false);
+  const [isEditPrepTimeModalVisible, setEditPrepTimeModalVisible] = useState(false);
+  const [isEditCodeModalVisible, setEditCodeModalVisible] = useState(false);
   const [name, setName] = useState('Wendys');
   const [code, setComedorCode] = useState('AS98DF2');
   const [email, setEmail] = useState('wendys@foodie.com');
@@ -19,8 +19,6 @@ const RestaurantProfile = () => {
   const [address, setAddress] = useState('Calle Marciano #114 Col. IV');
   const [prepTime, setPrepTime] = useState('5 minutos');
   const [rating, setRating] = useState('4 / 5');
-  const [isEditingInfo, setIsEditingInfo] = useState(false);
-  const [isEditingPrepTime, setIsEditingPrepTime] = useState(false);
   const [isFaqVisible, setIsFaqVisible] = useState(false);
   const navigation = useNavigation();
   const { logout } = useAuth();
@@ -30,7 +28,6 @@ const RestaurantProfile = () => {
   const [id, setID] = useState('');
   const [userType, setUserType] = useState('');
 
-  const handleToggleChange = () => setIsToggleOn(previousState => !previousState);
   const toggleFaqVisibility = () => setIsFaqVisible(!isFaqVisible);
 
   useEffect(() => {
@@ -96,6 +93,57 @@ const RestaurantProfile = () => {
         } 
   };
 
+  const handleEditInfo = async () => {
+    setLoading(true);
+        try {
+            const changed = await editInfoClient(name, phone, userType, id);
+            if (changed.status === 'success') {
+              Alert.alert('Información actualizada con éxito');
+            }
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            Alert.alert('Error al actualizar información');
+        } finally {
+            setEditInfoModalVisible(false);
+            setLoading(false);
+        }
+  };
+
+  const handleEditPrepTime = async () => {
+    setLoading(true);
+        try {
+            const changed = await editInfoClient(prepTime, userType, id);
+            if (changed.status === 'success') {
+              Alert.alert('Tiempo de preparación actualizado con éxito');
+            }
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            Alert.alert('Error al actualizar tiempo de preparación');
+        } finally {
+            setEditPrepTimeModalVisible(false);
+            setLoading(false);
+        }
+  };
+
+  const handleEditCode = async () => {
+    setLoading(true);
+        try {
+            const changed = await editInfoClient(code, userType, id);
+            if (changed.status === 'success') {
+              Alert.alert('Código de comedor actualizado con éxito');
+            }
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            Alert.alert('Error al actualizar código de comedor');
+        } finally {
+            setEditCodeModalVisible(false);
+            setLoading(false);
+        }
+  };
+
   if (loading) {
     return (
         <View style={styles.containerActivityIndicator}>
@@ -114,162 +162,81 @@ const RestaurantProfile = () => {
         <View style={{ width: 40 }}></View>
       </View>
 
-      <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.restaurantImage} />
+      <View style={styles.profileContainer}>
+        <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.restaurantImage} />
+      </View>
       <Text style={styles.restaurantName}>{name}</Text>
-      <Text style={styles.restaurantCode}>{code}</Text>
+      <TouchableOpacity onPress={() => setEditCodeModalVisible(true)}>
+        <Text style={styles.restaurantCode}>{code}</Text>
+      </TouchableOpacity>
 
-      <View style={styles.toggleButtons}>
-        <TouchableOpacity style={[styles.toggleButton, selectedTab === 'Información' && styles.selectedTab]} onPress={() => setSelectedTab('Información')}>
-          <Text style={styles.toggleButtonText}>Información</Text>
+      <View style={styles.infoSection}>
+        <View style={styles.infoCard}>
+          <View style={styles.infoRow}>
+            <Ionicons name="mail-outline" size={20} color="#FFA500" style={styles.icon} />
+            <Text style={styles.infoText}>{email}</Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.infoRow}>
+            <Ionicons name="call-outline" size={20} color="#FFA500" style={styles.icon} />
+            <Text style={styles.infoText}>{phone}</Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.infoRow}>
+            <Ionicons name="location-outline" size={20} color="#FFA500" style={styles.icon} />
+            <Text style={styles.infoText}>{address}</Text>
+          </View>
+          <TouchableOpacity style={styles.editButton} onPress={() => setEditInfoModalVisible(true)}>
+            <Text style={styles.editButtonText}>Editar</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.infoCard}>
+          <Text style={styles.sectionTitle}>Tiempo de preparación por pedido:</Text>
+          <Text style={styles.infoText}>{prepTime}</Text>
+          <TouchableOpacity style={styles.editButton} onPress={() => setEditPrepTimeModalVisible(true)}>
+            <Text style={styles.editButtonText}>Editar</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.infoCard}>
+          <Text style={styles.sectionTitle}>Calificación como restaurante:</Text>
+          <Text style={styles.infoText}>{rating}</Text>
+        </View>
+
+        <View style={styles.infoCard}>
+          <TouchableOpacity onPress={toggleFaqVisibility}>
+            <Text style={styles.sectionTitle}>Preguntas frecuentes</Text>
+          </TouchableOpacity>
+          {isFaqVisible && (
+            <View>
+              <View style={styles.faqItem}>
+                <Text style={styles.faqQuestion}>Q: What is Foodie?</Text>
+                <Text style={styles.faqAnswer}>A: Foodie is an online platform that allows users to order food from cafeterias and restaurants within designated areas...</Text>
+              </View>
+              <View style={styles.faqItem}>
+                <Text style={styles.faqQuestion}>Q: How does Foodie work?</Text>
+                <Text style={styles.faqAnswer}>A: Users can browse the menu of participating restaurants, select their desired items, and place an order...</Text>
+              </View>
+              <View style={styles.faqItem}>
+                <Text style={styles.faqQuestion}>Q: Is Foodie available for everyone?</Text>
+                <Text style={styles.faqAnswer}>A: Foodie is available for registered users within the specified cafeterias or restaurants...</Text>
+              </View>
+            </View>
+          )}
+        </View>
+
+        <TouchableOpacity style={styles.actionButton} onPress={() => setChangePasswordModalVisible(true)}>
+          <Text style={styles.actionButtonText}>Cambiar contraseña</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.toggleButton, selectedTab === 'Pedidos' && styles.selectedTab]} onPress={() => setSelectedTab('Pedidos')}>
-          <Text style={styles.toggleButtonText}>Pedidos</Text>
+        <TouchableOpacity style={styles.actionButton} onPress={() => setDeleteAccountModalVisible(true)}>
+          <Text style={styles.actionButtonText}>Eliminar cuenta</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton} onPress={logout}>
+          <Text style={styles.actionButtonText}>Cerrar Sesión</Text>
         </TouchableOpacity>
       </View>
 
-      {selectedTab === 'Información' && (
-        <View style={styles.infoSection}>
-          <View style={styles.infoCard}>
-            <View style={styles.infoRow}>
-              <Ionicons name="mail-outline" size={20} color="#FFA500" style={styles.icon} />
-              {isEditingInfo ? (
-                <TextInput
-                  style={styles.input}
-                  value={email}
-                  onChangeText={setEmail}
-                />
-              ) : (
-                <Text style={styles.infoText}>{email}</Text>
-              )}
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.infoRow}>
-              <Ionicons name="call-outline" size={20} color="#FFA500" style={styles.icon} />
-              {isEditingInfo ? (
-                <TextInput
-                  style={styles.input}
-                  value={phone}
-                  onChangeText={setPhone}
-                />
-              ) : (
-                <Text style={styles.infoText}>{phone}</Text>
-              )}
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.infoRow}>
-              <Ionicons name="location-outline" size={20} color="#FFA500" style={styles.icon} />
-              {isEditingInfo ? (
-                <TextInput
-                  style={styles.input}
-                  value={address}
-                  onChangeText={setAddress}
-                />
-              ) : (
-                <Text style={styles.infoText}>{address}</Text>
-              )}
-            </View>
-            <TouchableOpacity style={styles.editButton} onPress={() => setIsEditingInfo(!isEditingInfo)}>
-              <Text style={styles.editButtonText}>{isEditingInfo ? 'Guardar' : 'Editar'}</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.infoCard}>
-            <Text style={styles.sectionTitle}>Tiempo de preparación por pedido:</Text>
-            {isEditingPrepTime ? (
-              <TextInput
-                style={styles.input}
-                value={prepTime}
-                onChangeText={setPrepTime}
-              />
-            ) : (
-              <Text style={styles.infoText}>{prepTime}</Text>
-            )}
-            <TouchableOpacity style={styles.editButton} onPress={() => setIsEditingPrepTime(!isEditingPrepTime)}>
-              <Text style={styles.editButtonText}>{isEditingPrepTime ? 'Guardar' : 'Editar'}</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.infoCard}>
-            <Text style={styles.sectionTitle}>Calificación como restaurante:</Text>
-            <Text style={styles.infoText}>{rating}</Text>
-          </View>
-
-          <View style={styles.infoCard}>
-            <TouchableOpacity onPress={toggleFaqVisibility}>
-              <Text style={styles.sectionTitle}>Preguntas frecuentes</Text>
-            </TouchableOpacity>
-            {isFaqVisible && (
-              <View>
-                <View style={styles.faqItem}>
-                  <Text style={styles.faqQuestion}>Q: What is Foodie?</Text>
-                  <Text style={styles.faqAnswer}>A: Foodie is an online platform that allows users to order food from cafeterias and restaurants within designated areas...</Text>
-                </View>
-                <View style={styles.faqItem}>
-                  <Text style={styles.faqQuestion}>Q: How does Foodie work?</Text>
-                  <Text style={styles.faqAnswer}>A: Users can browse the menu of participating restaurants, select their desired items, and place an order...</Text>
-                </View>
-                <View style={styles.faqItem}>
-                  <Text style={styles.faqQuestion}>Q: Is Foodie available for everyone?</Text>
-                  <Text style={styles.faqAnswer}>A: Foodie is available for registered users within the specified cafeterias or restaurants...</Text>
-                </View>
-              </View>
-            )}
-          </View>
-
-          <TouchableOpacity style={styles.actionButton} onPress={() => setChangePasswordModalVisible(true)}>
-            <Text style={styles.actionButtonText}>Cambiar contraseña</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton} onPress={() => setDeleteAccountModalVisible(true)}>
-            <Text style={styles.actionButtonText}>Eliminar cuenta</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton} onPress={logout}>
-            <Text style={styles.actionButtonText}>Cerrar Sesión</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {selectedTab === 'Pedidos' && (
-        <View style={styles.ordersSection}>
-          <Text style={styles.sectionTitle}>Historial de pedidos</Text>
-          <TouchableOpacity style={styles.orderItem}>
-            <Image source={require('../assets/images/fotosCliente/FoxClient.jpeg')} style={styles.orderImage} />
-            <View style={styles.orderDetails}>
-              <Text style={styles.orderTitle}>Mike Tyson</Text>
-              <Text style={styles.orderText}>Productos: 6</Text>
-              <Text style={styles.orderText}>28/09/2023 8:38 am</Text>
-            </View>
-            <Text style={styles.orderTotal}>Total: $89</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.orderItem}>
-            <Image source={require('../assets/images/comida/taco.png')} style={styles.orderImage} />
-            <View style={styles.orderDetails}>
-              <Text style={styles.orderTitle}>Mike Tyson</Text>
-              <Text style={styles.orderText}>Productos: 6</Text>
-              <Text style={styles.orderText}>28/09/2023 8:38 am</Text>
-            </View>
-            <Text style={styles.orderTotal}>Total: $89</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.sectionTitle}>Menú</Text>
-          <View style={styles.menuItem}>
-            <Image source={require('../assets/images/comida/hamburger.png')} style={styles.menuItemImage} />
-            <View style={styles.menuItemInfo}>
-              <Text style={styles.menuItemText}>Hamburguesa</Text>
-              <Text style={styles.menuItemDescription}>Pan brioche, carne de res, lechuga...</Text>
-            </View>
-            <Switch value={isToggleOn} onValueChange={handleToggleChange} />
-          </View>
-
-          <View style={styles.menuItem}>
-            <Image source={require('../assets/images/comida/taco.png')} style={styles.menuItemImage} />
-            <View style={styles.menuItemInfo}>
-              <Text style={styles.menuItemText}>Tacos</Text>
-              <Text style={styles.menuItemDescription}>Tortilla, carne, salsa...</Text>
-            </View>
-            <Switch value={isToggleOn} onValueChange={handleToggleChange} />
-          </View>
-        </View>
-      )}
       <Modal
         transparent={true}
         animationType="fade"
@@ -331,6 +298,87 @@ const RestaurantProfile = () => {
           </View>
         </View>
       </Modal>
+
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={isEditInfoModalVisible}
+        onRequestClose={() => setEditInfoModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Editar Información</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Teléfono"
+              value={phone}
+              onChangeText={setPhone}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Dirección"
+              value={address}
+              onChangeText={setAddress}
+            />
+            <TouchableOpacity style={styles.modalButton} onPress={handleEditInfo}>
+              <Text style={styles.modalButtonText}>Guardar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalCancelButton} onPress={() => setEditInfoModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={isEditPrepTimeModalVisible}
+        onRequestClose={() => setEditPrepTimeModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Editar Tiempo de Preparación</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Tiempo de preparación"
+              value={prepTime}
+              onChangeText={setPrepTime}
+            />
+            <TouchableOpacity style={styles.modalButton} onPress={handleEditPrepTime}>
+              <Text style={styles.modalButtonText}>Guardar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalCancelButton} onPress={() => setEditPrepTimeModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={isEditCodeModalVisible}
+        onRequestClose={() => setEditCodeModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Editar Código de Comedor</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Código de Comedor"
+              value={code}
+              onChangeText={setComedorCode}
+            />
+            <TouchableOpacity style={styles.modalButton} onPress={handleEditCode}>
+              <Text style={styles.modalButtonText}>Guardar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalCancelButton} onPress={() => setEditCodeModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -369,12 +417,21 @@ const styles = StyleSheet.create({
     width: 180,
     height: 45,
   },
+  profileContainer: {
+    alignItems: 'center',
+    marginVertical: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
+  },
   restaurantImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    alignSelf: 'center',
-    marginBottom: 20,
+    borderColor: '#FFA500',
+    borderWidth: 3,
   },
   restaurantName: {
     fontSize: 24,
@@ -386,25 +443,6 @@ const styles = StyleSheet.create({
     color: '#FFA500',
     textAlign: 'center',
     marginBottom: 20,
-  },
-  toggleButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  toggleButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#ffc107',
-    borderRadius: 20,
-    margin: 5,
-  },
-  selectedTab: {
-    backgroundColor: '#ff9800',
-  },
-  toggleButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   infoSection: {
     paddingHorizontal: 10,
@@ -480,63 +518,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
-  ordersSection: {
-    paddingHorizontal: 10,
-  },
-  orderItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    marginBottom: 10,
-  },
-  orderImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  orderDetails: {
-    flex: 1,
-  },
-  orderTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  orderText: {
-    fontSize: 14,
-    color: '#555',
-  },
-  orderTotal: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    marginBottom: 10,
-  },
-  menuItemImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  menuItemInfo: {
-    flex: 1,
-  },
-  menuItemText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  menuItemDescription: {
-    fontSize: 14,
-    color: '#555',
-  },
   faqItem: {
     marginBottom: 10,
   },
@@ -547,19 +528,6 @@ const styles = StyleSheet.create({
   faqAnswer: {
     fontSize: 14,
     color: '#555',
-  },
-  contactButton: {
-    backgroundColor: '#ffc107',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  contactButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
   },
   modalContainer: {
     flex: 1,
@@ -610,13 +578,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 15,
     textAlign: 'center',
-  },
-  input: {
-    width: '100%',
-    padding: 10,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    marginBottom: 10,
   },
 });

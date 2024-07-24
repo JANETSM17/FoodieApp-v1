@@ -11,6 +11,7 @@ import Bolsa from "../pages/Bolsa";
 import BagFinalDetails from "../pages/BagFinalDetails";
 import Pedidos from "../pages/Pedidos";
 import MenuRestaurant from "../pages/MenuRestaurant";
+import HistorialRestaurant from "../pages/HistorialRestaurant";
 
 const Stack = createNativeStackNavigator();
 
@@ -52,6 +53,7 @@ function AppStack() {
           <Stack.Screen name="HomeRestaurant" component={HomeRestaurant} />
           <Stack.Screen name="RestaurantProfile" component={RestaurantProfile} />
           <Stack.Screen name="MenuRestaurant" component={MenuRestaurant}/>
+          <Stack.Screen name="HistorialRestaurant" component={HistorialRestaurant}/>
         </>
       )}
     </Stack.Navigator>
