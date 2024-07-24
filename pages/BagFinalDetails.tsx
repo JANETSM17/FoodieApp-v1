@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import RNPickerSelect from 'react-native-picker-select';
 
 const BagFinalDetails = () => {
   const [selectedOption, setSelectedOption] = useState('Foodie Box');
@@ -10,6 +11,7 @@ const BagFinalDetails = () => {
   const [minute, setMinute] = useState('');
   const [period, setPeriod] = useState('AM');
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isTimeModalVisible, setTimeModalVisible] = useState(false);
   const navigation = useNavigation();
 
   const handleConfirm = () => {
@@ -20,6 +22,15 @@ const BagFinalDetails = () => {
     setModalVisible(false);
     navigation.navigate('Home');
   };
+
+  const hours = Array.from({ length: 24 }, (_, i) => ({
+    label: i.toString().padStart(2, '0'),
+    value: i.toString().padStart(2, '0')
+  }));
+  const minutes = Array.from({ length: 60 }, (_, i) => ({
+    label: i.toString().padStart(2, '0'),
+    value: i.toString().padStart(2, '0')
+  }));
 
   return (
     <View style={styles.container}>
@@ -69,33 +80,12 @@ const BagFinalDetails = () => {
         onChangeText={setComments}
       />
 
-      <View style={styles.timeContainer}>
-        <TextInput
-          style={styles.timeInput}
-          placeholder="HH"
-          placeholderTextColor="#888"
-          value={hour}
-          onChangeText={setHour}
-          keyboardType="numeric"
-          maxLength={2}
-        />
-        <Text style={styles.colon}>:</Text>
-        <TextInput
-          style={styles.timeInput}
-          placeholder="MM"
-          placeholderTextColor="#888"
-          value={minute}
-          onChangeText={setMinute}
-          keyboardType="numeric"
-          maxLength={2}
-        />
-        <TouchableOpacity
-          style={styles.periodButton}
-          onPress={() => setPeriod(period === 'AM' ? 'PM' : 'AM')}
-        >
-          <Text style={styles.periodButtonText}>{period}</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={styles.selectTimeButton}
+        onPress={() => setTimeModalVisible(true)}
+      >
+        <Text style={styles.selectTimeButtonText}>Seleccionar la hora</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
         <Text style={styles.confirmButtonText}>Confirmar</Text>
@@ -112,6 +102,57 @@ const BagFinalDetails = () => {
             <Text style={styles.modalTitle}>Orden Confirmada</Text>
             <TouchableOpacity style={styles.homeButton} onPress={handleGoHome}>
               <Ionicons name="home" size={24} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        transparent={true}
+        visible={isTimeModalVisible}
+        onRequestClose={() => setTimeModalVisible(false)}
+      >
+        <View style={styles.timeModalContainer}>
+          <View style={styles.timeModalContent}>
+            <Text style={styles.modalTitle}>Selecciona la hora</Text>
+            <View style={styles.pickerContainer}>
+              <RNPickerSelect
+                onValueChange={(value) => setHour(value)}
+                items={hours}
+                style={pickerSelectStyles}
+                placeholder={{
+                  label: 'HH',
+                  value: null,
+                  color: '#888',
+                }}
+                value={hour}
+                useNativeAndroidPickerStyle={false}
+              />
+              <Text style={styles.colon}>:</Text>
+              <RNPickerSelect
+                onValueChange={(value) => setMinute(value)}
+                items={minutes}
+                style={pickerSelectStyles}
+                placeholder={{
+                  label: 'MM',
+                  value: null,
+                  color: '#888',
+                }}
+                value={minute}
+                useNativeAndroidPickerStyle={false}
+              />
+              <TouchableOpacity
+                style={styles.periodButton}
+                onPress={() => setPeriod(period === 'AM' ? 'PM' : 'AM')}
+              >
+                <Text style={styles.periodButtonText}>{period}</Text>
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={() => setTimeModalVisible(false)}
+            >
+              <Text style={styles.confirmButtonText}>Confirmar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -196,21 +237,24 @@ const styles = StyleSheet.create({
     color: '#000',
     marginHorizontal: 15,
   },
+  selectTimeButton: {
+    backgroundColor: '#000',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginHorizontal: 15,
+  },
+  selectTimeButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   timeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 30,
-  },
-  timeInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 10,
-    padding: 10,
-    textAlign: 'center',
-    width: 50,
-    marginHorizontal: 5,
-    color: '#000',
   },
   colon: {
     fontSize: 24,
@@ -221,6 +265,8 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   periodButtonText: {
     fontSize: 16,
@@ -272,6 +318,54 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 20,
     alignItems: 'center',
+  },
+  timeModalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  timeModalContent: {
+    width: 300,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    alignItems: 'center',
+    padding: 20,
+  },
+  pickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 20,
+  },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+    color: 'black',
+    paddingRight: 30,
+    marginHorizontal: 5,
+    width: 50,
+    textAlign: 'center',
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderWidth: 0.5,
+    borderColor: 'purple',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30,
+    marginHorizontal: 5,
+    width: 50,
+    textAlign: 'center',
   },
 });
 
