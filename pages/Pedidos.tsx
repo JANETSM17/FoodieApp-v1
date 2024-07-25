@@ -89,7 +89,7 @@ const Pedidos = ({ navigation }) => {
 
   const handleGoHome = () => {
     navigation.navigate('Home');
-};
+  };
 
   const renderPastOrder = ({ item }) => (
     <TouchableOpacity style={styles.orderHistoryItem}>
@@ -112,36 +112,31 @@ const Pedidos = ({ navigation }) => {
         <View style={{ width: 40 }}></View>
       </View>
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        <View style={styles.cardContainer}>
-          <View style={styles.sectionTitleContainer}>
-            <Text style={styles.sectionTitle}>Pedidos Pendientes</Text>
-          </View>
-          {pendingOrders.map((order) => (
-            <TouchableOpacity key={order.id} onPress={() => handlePendingOrderPress(order)} style={styles.orderCard}>
-              <Image source={order.image} style={styles.orderImage} />
-              <View>
-                <Text style={styles.orderRestaurant}>{order.restaurant}</Text>
-                <Text style={styles.orderPrice}>{order.price}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
+        <View style={styles.sectionTitleContainer}>
+          <Text style={styles.sectionTitle}>Pedidos Pendientes</Text>
         </View>
-        <View style={styles.cardContainer}>
-          <View style={styles.sectionTitleContainer}>
-            <Text style={styles.sectionTitle}>Historial de Pedidos</Text>
-          </View>
-          <FlatList
-            data={pastOrders}
-            renderItem={renderPastOrder}
-            keyExtractor={(item) => item.id}
-            ItemSeparatorComponent={() => <View style={styles.separator} />}
-          />
+        {pendingOrders.map((order) => (
+          <TouchableOpacity key={order.id} onPress={() => handlePendingOrderPress(order)} style={styles.orderCard}>
+            <Image source={order.image} style={styles.orderImage} />
+            <View>
+              <Text style={styles.orderRestaurant}>{order.restaurant}</Text>
+              <Text style={styles.orderPrice}>{order.price}</Text>
+            </View>
+          </TouchableOpacity>
+        ))}
+        <View style={styles.sectionTitleContainer}>
+          <Text style={styles.sectionTitle}>Historial de Pedidos</Text>
         </View>
+        <FlatList
+          data={pastOrders}
+          renderItem={renderPastOrder}
+          keyExtractor={(item) => item.id}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
       </ScrollView>
 
       {selectedOrder && (
         <Modal
-          animationType="slide"
           transparent={true}
           visible={modalVisible}
           onRequestClose={() => setModalVisible(false)}
@@ -195,21 +190,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 20,
-  },
-  cardContainer: {
-    backgroundColor: '#F8F8F8',
-    borderColor: '#FFA500',
-    borderWidth: 1,
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 5,
-    width: '90%',
-    alignSelf: 'center',
   },
   sectionTitleContainer: {
     alignItems: 'center',

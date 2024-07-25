@@ -26,16 +26,13 @@ const RestaurantScreen = () => {
     setLoading(true);
     try {
       if (carrito) {
-        // Confirmar si el producto ya está en el carrito y si se debe actualizar el proveedor
         const result = await confirmCarrito(item._id, carrito);
         if (result.exists) {
           console.log("Producto ya en el carrito");
           Alert.alert('Producto ya en el carrito', `${item.nombre} ya está en el carrito, para modificar la cantidad ve a la bolsa`);
         } else {
-          // Agregar el producto al carrito
           const addResult = await addToCarrito(item._id, carrito);
           if (addResult.status === 'success') {
-            // Mostrar alerta de éxito
             let message = `${item.nombre} ha sido agregado al carrito, para modificar la cantidad ve a la bolsa`;
             if (addResult.dar_aviso) {
               message += '\nEl producto que acabas de agregar le pertenece a un proveedor diferente que los productos que tenías en el carrito, por lo que el único producto en tu carrito será el que acabas de agregar. Recuerda que cada pedido debe de ser a un solo proveedor.';
@@ -50,7 +47,7 @@ const RestaurantScreen = () => {
     } catch (error) {
       console.error('Error confirmando carrito:', error);
       Alert.alert('Error', 'Hubo un problema al agregar el carrito');
-    }finally{
+    } finally {
       setLoading(false);
     }
   };  
@@ -66,13 +63,11 @@ const RestaurantScreen = () => {
         const comedorId = await AsyncStorage.getItem('selectedComedorId');
         const clientEmail = await AsyncStorage.getItem('clientEmail');
         if (comedorId && clientEmail) {
-            // Obtener ID del carrito
             const carritoId = await getCarritoID(clientEmail);
             console.log('ID del carrito:', carritoId);
             setCarrito(carritoId);
             await AsyncStorage.setItem('carritoID', carritoId);
 
-            // Obtener información del comedor
             const comedorInfo = await getComedor(comedorId);
             setComedor(comedorInfo);
             setMenuItems({
@@ -100,40 +95,52 @@ const RestaurantScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
-        <Image source={require('../assets/images/logos/FoodieNegro.png')} style={styles.fBlack} />
-      </View>
-      <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.restaurantImage} />
-      <Text style={styles.restaurantName}>{comedor.nombre}</Text>
-
-      <View style={styles.menuTabs}>
-        {Object.keys(menuItems).map((menu) => (
-          <TouchableOpacity
-            key={menu}
-            style={[styles.menuTab, selectedMenu === menu && styles.menuTabSelected]}
-            onPress={() => setSelectedMenu(menu)}
-          >
-            <Text style={styles.menuTabText}>{menu}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {menuItems[selectedMenu].map((item, index) => (
-        <View key={index} style={styles.menuItem}>
-          <Image source={item.imagen} style={styles.menuItemImage} /> 
-          <View style={styles.menuItemInfo}>
-            <Text style={styles.menuItemText}>{item.nombre}</Text>
-            <Text style={styles.menuItemDescription}>{item.descripcion}</Text>
-            <Text style={styles.menuItemPrice}>${item.precio}</Text>
-          </View>
-          <TouchableOpacity style={styles.addButton} onPress={() => addToCart(item)}>
-            <Image source={require('../assets/images/recursosExtras/AgregarbolsaB.png')} style={styles.addButtonImage} />
+      <View style={styles.blackSection}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
         </View>
-      ))}
+        <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.restaurantImage} />
+        <Text style={styles.restaurantName}>{comedor?.nombre}</Text>
+      </View>
+      <View style={styles.contentContainer}>
+        <View style={styles.menuTabs}>
+          {Object.keys(menuItems).map((menu) => (
+            <TouchableOpacity
+              key={menu}
+              style={[
+                styles.menuTab,
+                selectedMenu === menu && styles.menuTabSelected,
+              ]}
+              onPress={() => setSelectedMenu(menu)}
+            >
+              <Text
+                style={[
+                  styles.menuTabText,
+                  selectedMenu === menu && styles.menuTabTextSelected,
+                ]}
+              >
+                {menu}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {menuItems[selectedMenu].map((item, index) => (
+          <View key={index} style={styles.menuItem}>
+            <Image source={item.imagen} style={styles.menuItemImage} /> 
+            <View style={styles.menuItemInfo}>
+              <Text style={styles.menuItemText}>{item.nombre}</Text>
+              <Text style={styles.menuItemDescription}>{item.descripcion}</Text>
+              <Text style={styles.menuItemPrice}>${item.precio}</Text>
+            </View>
+            <TouchableOpacity style={styles.addButton} onPress={() => addToCart(item)}>
+              <Image source={require('../assets/images/recursosExtras/AgregarbolsaB.png')} style={styles.addButtonImage} />
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
     </ScrollView>
   );
 }
@@ -151,57 +158,77 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 20,
+  },
+  blackSection: {
+    backgroundColor: 'black',
+    paddingVertical: 10,
+    alignItems: 'center',
+    paddingBottom: 30,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    alignSelf: 'flex-start',
   },
   backButton: {
     padding: 10,
   },
   backButtonText: {
     fontSize: 24,
-    color: '#000',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginLeft: 10,
+    color: '#fff',
   },
   restaurantImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderColor: '#FFA500',
+    borderWidth: 3,
     alignSelf: 'center',
-    marginBottom: 20,
+    marginVertical: 10,
   },
   restaurantName: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    color: '#FFA500',
+    marginBottom: 10, // Added marginBottom for spacing
+  },
+  contentContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    marginTop: -30,
+    paddingTop: 20,
+    paddingHorizontal: 20, // Added padding to create margin around the content
   },
   menuTabs: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 20,
+    marginVertical: 10,
     flexWrap: 'wrap',
   },
   menuTab: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    backgroundColor: '#ffc107',
+    backgroundColor: '#fff',
     borderRadius: 20,
     margin: 5,
+    borderColor: '#FFA500',
+    borderWidth: 1,
   },
   menuTabSelected: {
-    backgroundColor: '#ff9800',
+    backgroundColor: '#FFA500',
   },
   menuTabText: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: 'black',
+  },
+  menuTabTextSelected: {
+    color: 'white',
   },
   menuItem: {
     flexDirection: 'row',
@@ -240,10 +267,4 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
   },
-  fBlack: {
-    width: 100,
-    height: 25,
-    marginBottom: 20,
-    marginTop: 25,
-},
 });
