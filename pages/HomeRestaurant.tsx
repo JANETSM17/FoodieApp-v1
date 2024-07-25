@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Modal, TextInput, Picker } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
@@ -112,6 +112,11 @@ const HomeRestaurant = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [statusModalVisible, setStatusModalVisible] = useState(false);
   const [orders, setOrders] = useState(ordersInProgress);
+  const [isAddProductModalVisible, setAddProductModalVisible] = useState(false);
+  const [productName, setProductName] = useState('');
+  const [productPrice, setProductPrice] = useState('');
+  const [productDescription, setProductDescription] = useState('');
+  const [productCategory, setProductCategory] = useState('Comida');
 
   const navigation = useNavigation();
 
@@ -170,6 +175,23 @@ const HomeRestaurant = () => {
       )
     );
     setStatusModalVisible(false);
+  };
+
+  const handleAddProductPress = () => {
+    setAddProductModalVisible(true);
+  };
+
+  const handleCloseAddProductModal = () => {
+    setAddProductModalVisible(false);
+    setProductName('');
+    setProductPrice('');
+    setProductDescription('');
+    setProductCategory('Comida');
+  };
+
+  const handleAddProduct = () => {
+    
+    setAddProductModalVisible(false);
   };
 
   return (
@@ -257,7 +279,7 @@ const HomeRestaurant = () => {
         <TouchableOpacity onPress={() => navigation.navigate('MenuRestaurant')} style={styles.navButton}>
           <Ionicons name="restaurant-outline" size={30} color="#FFFFFF" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => {}} style={styles.navButton}>
+        <TouchableOpacity onPress={handleAddProductPress} style={styles.navButton}>
           <Ionicons name="add-circle-outline" size={30} color="#FFA500" />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('HistorialRestaurant')} style={styles.navButton}>
@@ -267,6 +289,59 @@ const HomeRestaurant = () => {
           <Ionicons name="person-outline" size={30} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={isAddProductModalVisible}
+        onRequestClose={handleCloseAddProductModal}
+      >
+        <View style={styles.addProductModalContainer}>
+          <View style={styles.addProductModalContent}>
+            <Text style={styles.addProductModalTitle}>Agregar producto</Text>
+            <TouchableOpacity style={styles.imageUploadButton}>
+              <Ionicons name="camera-outline" size={50} color="gray" />
+            </TouchableOpacity>
+            <TextInput
+              style={styles.input}
+              placeholder="Nombre del producto"
+              value={productName}
+              onChangeText={setProductName}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Precio del producto"
+              value={productPrice}
+              onChangeText={setProductPrice}
+              keyboardType="numeric"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Descripción del producto"
+              value={productDescription}
+              onChangeText={setProductDescription}
+            />
+            <Picker
+              selectedValue={productCategory}
+              style={styles.picker}
+              onValueChange={(itemValue) => setProductCategory(itemValue)}
+            >
+              <Picker.Item label="Comida" value="Comida" />
+              <Picker.Item label="Bebidas" value="Bebidas" />
+              <Picker.Item label="Frituras" value="Frituras" />
+              <Picker.Item label="Dulces" value="Dulces" />
+              <Picker.Item label="Otros" value="Otros" />
+            </Picker>
+            <View style={styles.addProductModalButtonsContainer}>
+              <TouchableOpacity style={styles.addProductModalButton} onPress={handleAddProduct}>
+                <Text style={styles.addProductModalButtonText}>Agregar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.addProductModalButtonCancel} onPress={handleCloseAddProductModal}>
+                <Text style={styles.addProductModalButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -484,5 +559,69 @@ const styles = StyleSheet.create({
   },
   navButton: {
     alignItems: 'center',
+  },
+  addProductModalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  addProductModalContent: {
+    width: 350,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    alignItems: 'center',
+    padding: 20,
+  },
+  addProductModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  imageUploadButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#E0E0E0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  input: {
+    width: '100%',
+    padding: 10,
+    marginVertical: 10,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 10,
+    textAlign: 'center',
+  },
+  picker: {
+    width: '100%',
+    marginBottom: 10,
+  },
+  addProductModalButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: 20,
+  },
+  addProductModalButton: {
+    backgroundColor: '#FFA500',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    alignItems: 'center',
+  },
+  addProductModalButtonCancel: {
+    backgroundColor: '#FF0000',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    alignItems: 'center',
+  },
+  addProductModalButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });

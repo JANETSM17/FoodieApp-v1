@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Switch, Modal, TextInput, Alert, Picker } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Switch, Modal, TextInput, Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 
