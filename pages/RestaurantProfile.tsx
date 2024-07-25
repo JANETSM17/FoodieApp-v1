@@ -167,7 +167,7 @@ const RestaurantProfile = () => {
       </View>
       <Text style={styles.restaurantName}>{name}</Text>
       <TouchableOpacity onPress={() => setEditCodeModalVisible(true)}>
-        <Text style={styles.restaurantCode}>{code}</Text>
+      <Text style={styles.restaurantCode}>{code}</Text>
       </TouchableOpacity>
 
       <View style={styles.infoSection}>
@@ -477,12 +477,12 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   input: {
-    flex: 1,
+    width: '100%',
     padding: 10,
-    borderColor: '#ddd',
-    borderWidth: 1,
     borderRadius: 10,
-    textAlign: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 10,
   },
   editButton: {
     backgroundColor: '#000',

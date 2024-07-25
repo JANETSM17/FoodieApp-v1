@@ -1,26 +1,110 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Modal, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import RNPickerSelect from 'react-native-picker-select';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { confirmFoodieBox, confirmPedido, getProductos, confirmEspera, sendPedido } from '../services/demoService'; // Ajusta el path según corresponda
 
 const BagFinalDetails = () => {
-  const [selectedOption, setSelectedOption] = useState('Foodie Box');
-  const [comments, setComments] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [pickUpOption, setPickUpOption] = useState('mostrador');
+  const [comments, setComments] = useState('Pedido sin especificaciones especiales');
   const [hour, setHour] = useState('');
   const [minute, setMinute] = useState('');
-  const [period, setPeriod] = useState('AM');
+  const [email, setEmail] = useState('');
+  const [carrito, setCarrito] = useState('');
+  const [mensajeModal, setMensajeModal] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
   const [isTimeModalVisible, setTimeModalVisible] = useState(false);
+  const [foodieBoxAvailable, setFoodieBoxAvailable] = useState(false);
   const navigation = useNavigation();
 
-  const handleConfirm = () => {
-    setModalVisible(true);
+  useEffect(() => {
+    handleLoad();
+  }, []);
+
+  const handleLoad = async () => {
+    setLoading(true);
+    try {
+      const carritoID = await AsyncStorage.getItem('carritoID');
+      const correo = await AsyncStorage.getItem('clientEmail');
+      if (carritoID && correo) {
+        const result = await confirmFoodieBox(carritoID);
+        setFoodieBoxAvailable(result.status);
+        setEmail(correo);
+        setCarrito(carritoID)
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGoHome = () => {
+  const handleConfirm = async () => {
+    setLoading(true);
+    try {
+      const productos = await getProductos(carrito);
+      if (productos.length === 0) {
+        Alert.alert('Error', 'No puedes hacer un pedido sin productos');
+        setLoading(false);
+        return;
+      }
+      const pedidosPendientes = await confirmPedido(email);
+      if (pedidosPendientes.cuenta > 0) {
+        Alert.alert('Error', 'Lo lamentamos, pero parece ser que tienes un pedido pendiente de recoger. No podrás hacer un pedido nuevo hasta que pagues y recojas tu pedido anterior');
+        setLoading(false);
+        return;
+      }
+  
+      const result = await confirmEspera(carrito);
+      if(result){
+        if(hour && minute !== null){
+          const minEspera = result[0].min_espera; 
+
+          const fechaActual = new Date();
+          const userTime = new Date(fechaActual);
+          userTime.setHours(parseInt(hour, 10));
+          userTime.setMinutes(parseInt(minute, 10));
+
+          // Calcular la diferencia en minutos usando .getTime() para obtener milisegundos
+          const diferenciaMilisegundos = userTime.getTime() - fechaActual.getTime();
+          const diferenciaMinutos = Math.ceil(diferenciaMilisegundos / 60000); // Diferencia en minutos.
+
+          console.log('Diferencia en minutos: ',diferenciaMinutos);
+
+          let espera = diferenciaMinutos;
+          if (diferenciaMinutos < minEspera) {
+            setMensajeModal('El tiempo seleccionado era \nmenor al tiempo minimo de\nespera de su comedor, por lo\nque se le asignara el tiempo \nde espera minimo.')
+            espera = minEspera;
+          } else {
+            setMensajeModal('Pasa a recoger tu pedido\na la hora indicada')
+          }
+
+          const sendResult = await sendPedido(carrito, espera, comments, pickUpOption, email);
+          if (sendResult.status === 'error') {
+            Alert.alert('Error', sendResult.message);
+          } else {
+            setModalVisible(true);
+          }
+        }else{
+          Alert.alert('Ingresa la hora para recoger')
+          setLoading(false);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Error confirming order:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
+  const handleGoPedidos = () => {
     setModalVisible(false);
-    navigation.navigate('Home');
+    navigation.navigate('Pedidos');
   };
 
   const hours = Array.from({ length: 24 }, (_, i) => ({
@@ -31,6 +115,14 @@ const BagFinalDetails = () => {
     label: i.toString().padStart(2, '0'),
     value: i.toString().padStart(2, '0')
   }));
+
+  if (loading) {
+    return (
+      <View style={styles.containerActivityIndicator}>
+        <ActivityIndicator size="large" color="#F5B000" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -47,9 +139,10 @@ const BagFinalDetails = () => {
         <TouchableOpacity
           style={[
             styles.optionButton,
-            selectedOption === 'Foodie Box' && styles.selectedOptionButton
+            pickUpOption === 'foodiebox' && styles.selectedOptionButton
           ]}
-          onPress={() => setSelectedOption('Foodie Box')}
+          onPress={() => foodieBoxAvailable ? setPickUpOption('foodiebox') : null}
+          disabled={!foodieBoxAvailable}
         >
           <Image
             source={require('../assets/images/recursosExtras/Comprador.png')}
@@ -60,15 +153,15 @@ const BagFinalDetails = () => {
         <TouchableOpacity
           style={[
             styles.optionButton,
-            selectedOption === 'Pick Up' && styles.selectedOptionButton
+            pickUpOption === 'mostrador' && styles.selectedOptionButton
           ]}
-          onPress={() => setSelectedOption('Pick Up')}
+          onPress={() => setPickUpOption('mostrador')}
         >
           <Image
             source={require('../assets/images/recursosExtras/cafeteria.png')}
             style={styles.optionImage}
           />
-          <Text style={styles.optionText}>Pick Up</Text>
+          <Text style={styles.optionText}>Mostrador</Text>
         </TouchableOpacity>
       </View>
 
@@ -98,10 +191,11 @@ const BagFinalDetails = () => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Image source={require('../assets/images/recursosExtras/Plato.png')} style={styles.successImage} />
+            <Image source={require('../assets/images/logos/blacklogo.png')} style={styles.successImage} />
             <Text style={styles.modalTitle}>Orden Confirmada</Text>
-            <TouchableOpacity style={styles.homeButton} onPress={handleGoHome}>
-              <Ionicons name="home" size={24} color="#fff" />
+            <Text style={styles.modalText}>{mensajeModal}</Text>
+            <TouchableOpacity style={styles.homeButton} onPress={handleGoPedidos}>
+              <Ionicons name="receipt-outline" size={24} color="#fff" />
             </TouchableOpacity>
           </View>
         </View>
@@ -141,12 +235,6 @@ const BagFinalDetails = () => {
                 value={minute}
                 useNativeAndroidPickerStyle={false}
               />
-              <TouchableOpacity
-                style={styles.periodButton}
-                onPress={() => setPeriod(period === 'AM' ? 'PM' : 'AM')}
-              >
-                <Text style={styles.periodButtonText}>{period}</Text>
-              </TouchableOpacity>
             </View>
             <TouchableOpacity
               style={styles.confirmButton}
@@ -162,6 +250,13 @@ const BagFinalDetails = () => {
 };
 
 const styles = StyleSheet.create({
+  containerActivityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F0F0F0',
+    padding: 20,
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -215,6 +310,9 @@ const styles = StyleSheet.create({
   selectedOptionButton: {
     backgroundColor: '#FFA500',
   },
+  disabledOptionButton: {
+    backgroundColor: '#ddd',
+  },
   optionImage: {
     width: 40,
     height: 40,
@@ -242,46 +340,21 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
-    alignItems: 'center',
-    marginHorizontal: 15,
+    marginBottom: 30,
+    alignSelf: 'center',
   },
   selectTimeButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
-  timeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 30,
-  },
-  colon: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginHorizontal: 5,
-  },
-  periodButton: {
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: '#000',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  periodButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
   confirmButton: {
-    marginTop: 20,
-    marginBottom: 10,
     backgroundColor: '#FFA500',
     paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    alignItems: 'center',
-    marginHorizontal: 15,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+    alignSelf: 'center',
+    marginBottom: 20,
   },
   confirmButtonText: {
     color: '#fff',
@@ -295,11 +368,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: 300,
     backgroundColor: '#fff',
+    padding: 20,
     borderRadius: 10,
     alignItems: 'center',
-    padding: 20,
   },
   successImage: {
     width: 60,
@@ -309,15 +381,12 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   homeButton: {
-    marginTop: 20,
     backgroundColor: '#FFA500',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    alignItems: 'center',
+    padding: 10,
+    borderRadius: 10,
   },
   timeModalContainer: {
     flex: 1,
@@ -326,17 +395,25 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   timeModalContent: {
-    width: 300,
     backgroundColor: '#fff',
+    padding: 20,
     borderRadius: 10,
     alignItems: 'center',
-    padding: 20,
   },
   pickerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 20,
+    marginBottom: 20,
+  },
+  colon: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginHorizontal: 5,
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });
 
@@ -349,23 +426,17 @@ const pickerSelectStyles = StyleSheet.create({
     borderColor: 'gray',
     borderRadius: 4,
     color: 'black',
-    paddingRight: 30,
-    marginHorizontal: 5,
-    width: 50,
-    textAlign: 'center',
+    paddingRight: 30, // to ensure the text is never behind the icon
   },
   inputAndroid: {
     fontSize: 16,
-    paddingVertical: 8,
     paddingHorizontal: 10,
+    paddingVertical: 8,
     borderWidth: 0.5,
     borderColor: 'purple',
     borderRadius: 8,
     color: 'black',
-    paddingRight: 30,
-    marginHorizontal: 5,
-    width: 50,
-    textAlign: 'center',
+    paddingRight: 30, // to ensure the text is never behind the icon
   },
 });
 

@@ -511,4 +511,112 @@ async function editInfoClient(nombre, telefono, userType, id) {
   }
 }
 
-export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword, deleteAccount, getProductos, deleteProducto, modifyQuantityProducto,editInfoClient };
+async function confirmFoodieBox(idCarrito) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}confirmarFoodieBox/${idCarrito}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error confirming FoodieBox");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error confirming FoodieBox:", error);
+    return { status: false };
+  }
+}
+
+async function confirmPedido(email) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}confirmarPedidos/${email}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error confirming pedidos");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error confirming pedidos:", error);
+    return { status: 'error' };
+  }
+}
+
+async function confirmEspera(idCarrito) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}confirmarEspera/${idCarrito}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error confirming wait time");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error confirming wait time:", error);
+    return { min_espera: [] };
+  }
+}
+
+async function sendPedido(idCarrito, espera, especificaciones, pickup, email) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}enviarPedido/${idCarrito}/${espera}/${encodeURI(especificaciones)}/${pickup}/${email}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error sending pedido");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error sending pedido:", error);
+    return { status: 'error', message: 'Ocurrió un error al enviar el pedido.' };
+  }
+}
+
+export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword, deleteAccount, getProductos, deleteProducto, modifyQuantityProducto,editInfoClient, confirmFoodieBox, confirmPedido, confirmEspera, sendPedido };

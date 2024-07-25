@@ -87,6 +87,10 @@ const Pedidos = ({ navigation }) => {
     setModalVisible(true);
   };
 
+  const handleGoHome = () => {
+    navigation.navigate('Home');
+};
+
   const renderPastOrder = ({ item }) => (
     <TouchableOpacity style={styles.orderHistoryItem}>
       <Image source={item.image} style={styles.orderImage} />
@@ -101,7 +105,7 @@ const Pedidos = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={styles.backButton} onPress={handleGoHome}>
           <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Pedidos</Text>
