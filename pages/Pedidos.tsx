@@ -53,28 +53,28 @@ const pastOrders = [
     restaurant: 'KFC',
     date: '20/agosto/2023 12:00 pm',
     total: '$45',
-    image: require('../assets/images/restaurantes/Dominos_Logo.png'), // Update with KFC logo if available
+    image: require('../assets/images/restaurantes/Dominos_Logo.png'), 
   },
   {
     id: '7',
     restaurant: 'Burger King',
     date: '20/agosto/2023 1:15 pm',
     total: '$35',
-    image: require('../assets/images/restaurantes/Dominos_Logo.png'), // Update with Burger King logo if available
+    image: require('../assets/images/restaurantes/Dominos_Logo.png'), 
   },
   {
     id: '8',
     restaurant: 'Subway',
     date: '21/agosto/2023 2:30 pm',
     total: '$22',
-    image: require('../assets/images/restaurantes/Dominos_Logo.png'), // Update with Subway logo if available
+    image: require('../assets/images/restaurantes/Dominos_Logo.png'), 
   },
   {
     id: '9',
     restaurant: 'Starbucks',
     date: '21/agosto/2023 3:45 pm',
     total: '$18',
-    image: require('../assets/images/restaurantes/Dominos_Logo.png'), // Update with Starbucks logo if available
+    image: require('../assets/images/restaurantes/Dominos_Logo.png'), 
   },
 ];
 

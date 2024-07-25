@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#FFA500',
-    marginBottom: 10, // Added marginBottom for spacing
+    marginBottom: 10, 
   },
   contentContainer: {
     flex: 1,
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     marginTop: -30,
     paddingTop: 20,
-    paddingHorizontal: 20, // Added padding to create margin around the content
+    paddingHorizontal: 20, 
   },
   menuTabs: {
     flexDirection: 'row',
