@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Image} from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator} from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Asegúrate de tener instalado @expo/vector-icons
 import { authHost } from "../constants/auth.constants";
 
 const Register = ({ route, navigation }) => {
+  const [loading, setLoading] = useState(false);
   const { userType } = route.params;
   const [formData, setFormData] = useState({
     nombre: '',
@@ -25,6 +26,7 @@ const Register = ({ route, navigation }) => {
   };
 
   const handleRegister = async () => {
+    setLoading(true);
     const payload = userType === 'Usuario' ? {
       nombre: formData.nombre,
       apellido: formData.apellido,
@@ -58,14 +60,27 @@ const Register = ({ route, navigation }) => {
 
       if (response.status === 201) {
         console.log('Éxito', 'Usuario registrado con éxito');
-        navigation.navigate('Login'); // Redirige al login después de registrarse
+        navigation.reset({
+          index: 1,
+          routes: [{ name: 'Landing' }, { name: 'Login' }],
+        }); // Redirige al login después de registrarse
       } else {
         console.log('Error', data.message || 'Error al registrar el usuario');
       }
     } catch (error) {
       console.log('Error', 'No se pudo conectar con el servidor');
+    }finally{
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.containerActivityIndicator}>
+        <ActivityIndicator size="large" color="#F5B000" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -172,6 +187,13 @@ const Register = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  containerActivityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F0F0F0',
+    padding: 20,
+  },
   container: {
     flexGrow: 1,
     justifyContent: 'center',

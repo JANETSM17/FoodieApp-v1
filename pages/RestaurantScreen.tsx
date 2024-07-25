@@ -71,7 +71,6 @@ const RestaurantScreen = () => {
             console.log('ID del carrito:', carritoId);
             setCarrito(carritoId);
             await AsyncStorage.setItem('carritoID', carritoId);
-            // Puedes guardar el carritoId en el estado si es necesario
 
             // Obtener información del comedor
             const comedorInfo = await getComedor(comedorId);

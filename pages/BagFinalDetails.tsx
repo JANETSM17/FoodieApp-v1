@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import RNPickerSelect from 'react-native-picker-select';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { confirmFoodieBox, confirmPedido, getProductos, confirmEspera, sendPedido } from '../services/demoService'; // Ajusta el path según corresponda
+import { confirmFoodieBox, confirmPedido, getProductos, confirmEspera, sendPedido, getCarritoID } from '../services/demoService'; // Ajusta el path según corresponda
 
 const BagFinalDetails = () => {
   const [loading, setLoading] = useState(true);
@@ -86,6 +86,12 @@ const BagFinalDetails = () => {
           if (sendResult.status === 'error') {
             Alert.alert('Error', sendResult.message);
           } else {
+            const carritoId = await getCarritoID(email);
+            if(carritoId){
+              console.log('ID del carrito:', carritoId);
+              setCarrito(carritoId);
+              await AsyncStorage.setItem('carritoID', carritoId);
+            }
             setModalVisible(true);
           }
         }else{
@@ -97,15 +103,19 @@ const BagFinalDetails = () => {
     } catch (error) {
       console.error('Error confirming order:', error);
     } finally {
-      setLoading(false);
+      handleLoad()
     }
   };
   
 
   const handleGoPedidos = () => {
     setModalVisible(false);
-    navigation.navigate('Pedidos');
+    navigation.reset({
+      index: 1,
+      routes: [{ name: 'Home' }, { name: 'Pedidos' }],
+    });
   };
+  
 
   const hours = Array.from({ length: 24 }, (_, i) => ({
     label: i.toString().padStart(2, '0'),
@@ -164,7 +174,7 @@ const BagFinalDetails = () => {
           <Text style={styles.optionText}>Mostrador</Text>
         </TouchableOpacity>
       </View>
-
+      <Text style={styles.chooseText}>Especificaciones:</Text>
       <TextInput
         style={styles.commentInput}
         placeholder="Comentarios/Indicaciones"
@@ -187,7 +197,7 @@ const BagFinalDetails = () => {
       <Modal
         transparent={true}
         visible={isModalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={() => setModalVisible(true)}
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
