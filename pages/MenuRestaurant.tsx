@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Switch, Modal, TextInput, Alert, Picker } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Switch, Modal, TextInput, Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 
@@ -253,15 +253,7 @@ const MenuRestaurant = () => {
               value={editedDescription}
               onChangeText={setEditedDescription}
             />
-            <Picker
-              selectedValue={editedCategory}
-              style={styles.picker}
-              onValueChange={(itemValue) => setEditedCategory(itemValue)}
-            >
-              {categories.map((category) => (
-                <Picker.Item key={category} label={category} value={category} />
-              ))}
-            </Picker>
+            
             <TouchableOpacity style={styles.uploadButton}>
               <Text style={styles.uploadButtonText}>Subir imagen</Text>
             </TouchableOpacity>

@@ -1,62 +1,43 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Image, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
-
-const ordersHistory = [
-  {
-    id: 1,
-    customerName: 'Mike Tyson',
-    orderNumber: 21,
-    phoneNumber: '(614)-216-78-27',
-    items: [
-      '2x Pizza Piña',
-      '1x Hamburguesa',
-      '4x Coca-Cola',
-    ],
-    specifications: 'Sin especificaciones',
-    total: 250,
-    pickupTime: '11:59 am',
-    deliveryType: 'Foodie-Box',
-    status: 'Entregado'
-  },
-  {
-    id: 2,
-    customerName: 'John Doe',
-    orderNumber: 22,
-    phoneNumber: '(614)-216-78-28',
-    items: [
-      '1x Burrito',
-      '1x Taco',
-      '2x Sprite',
-    ],
-    specifications: 'Sin salsa',
-    total: 150,
-    pickupTime: '12:30 pm',
-    deliveryType: 'Pick-Up',
-    status: 'Entregado'
-  },
-  {
-    id: 3,
-    customerName: 'Jane Smith',
-    orderNumber: 23,
-    phoneNumber: '(614)-216-78-29',
-    items: [
-      '3x Ensalada',
-      '2x Agua',
-    ],
-    specifications: 'Con aderezo aparte',
-    total: 200,
-    pickupTime: '1:00 pm',
-    deliveryType: 'Foodie-Box',
-    status: 'Entregado'
-  },
-];
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getHistorialPedidos } from '../services/demoService'; 
 
 const HistorialRestaurant = () => {
+  const [loading, setLoading] = useState(true);
+  const [ordersHistory, setOrdersHistory] = useState([]);
   const navigation = useNavigation();
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    handleLoad();
+  }, []);
+
+  const handleLoad = async () => {
+    setLoading(true);
+    try {
+      const clientEmail = await AsyncStorage.getItem('clientEmail');
+      if (clientEmail) {
+        const orders = await getHistorialPedidos(clientEmail);
+        setOrdersHistory(orders);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.containerActivityIndicator}>
+        <ActivityIndicator size="large" color="#F5B000" />
+      </View>
+    );
+  }
 
   const handleOrderPress = (order) => {
     setSelectedOrder(order);
@@ -79,17 +60,17 @@ const HistorialRestaurant = () => {
       </View>
       <ScrollView style={styles.container}>
         {ordersHistory.map((order) => (
-          <TouchableOpacity key={order.id} style={styles.orderContainer} onPress={() => handleOrderPress(order)}>
+          <TouchableOpacity key={order._id} style={styles.orderContainer} onPress={() => handleOrderPress(order)}>
             <View style={styles.orderHeader}>
               <Image source={require('../assets/images/fotosCliente/FoxClient.jpeg')} style={styles.avatar} />
               <View>
-                <Text style={styles.customerName}>{order.customerName}</Text>
-                <Text style={styles.orderDetails}>Número de pedido: <Text style={styles.boldText}>{order.orderNumber}</Text></Text>
+                <Text style={styles.customerName}>{order.nombre}</Text>
+                <Text style={styles.orderDetails}>Número de pedido: <Text style={styles.boldText}>{order.numerodepedido}</Text></Text>
               </View>
             </View>
             <Text style={styles.totalText}>Total: <Text style={styles.boldText}>${order.total}</Text></Text>
-            <Text style={styles.pickupTimeText}>Hora de Pick-up: {order.pickupTime}</Text>
-            <Text style={styles.deliveryTypeText}>Tipo de entrega: {order.deliveryType}</Text>
+            <Text style={styles.pickupTimeText}>Fecha y hora de Pick-up: {order.hora}</Text>
+            <Text style={styles.deliveryTypeText}>Tipo de entrega: {order.pickup}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -104,10 +85,10 @@ const HistorialRestaurant = () => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Detalles del Pedido</Text>
-              <Text style={styles.modalText}>Especificaciones: {selectedOrder.specifications}</Text>
-              <Text style={styles.modalText}>Tipo de entrega: {selectedOrder.deliveryType}</Text>
+              <Text style={styles.modalText}>Especificaciones: {selectedOrder.especificaciones}</Text>
+              <Text style={styles.modalText}>Tipo de entrega: {selectedOrder.pickup}</Text>
               <Text style={styles.modalText}>Productos:</Text>
-              {selectedOrder.items.map((item, index) => (
+              {selectedOrder.descripcion.split(',').map((item, index) => (
                 <Text key={index} style={styles.modalItemText}>{item}</Text>
               ))}
               <TouchableOpacity style={styles.modalButton} onPress={handleCloseModal}>
@@ -122,6 +103,13 @@ const HistorialRestaurant = () => {
 };
 
 const styles = StyleSheet.create({
+  containerActivityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F0F0F0',
+    padding: 20,
+  },
   mainContainer: {
     flex: 1,
     backgroundColor: 'white',

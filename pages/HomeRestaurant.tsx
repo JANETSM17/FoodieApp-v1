@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import useAuth from "../hooks/useAuth";
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUserInfo } from '../services/demoService';
 
 const ordersInProgress = [
   {
@@ -106,6 +109,8 @@ const ordersReady = [
 ];
 
 const HomeRestaurant = () => {
+  const { logout } = useAuth();
+  const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState('InProgress');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -114,6 +119,28 @@ const HomeRestaurant = () => {
   const [orders, setOrders] = useState(ordersInProgress);
 
   const navigation = useNavigation();
+
+  useEffect(() => {
+    handleLoad();
+}, []);
+
+const handleLoad = async () => {
+    setLoading(true);
+    try {
+        const clientInfo = await getUserInfo();
+        if (!clientInfo) {
+            logout();
+            return;
+        }
+
+        await AsyncStorage.setItem('clientEmail', clientInfo.correo);
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    } finally {
+        setLoading(false);
+    }
+};
 
   const renderOrders = (orders) => {
     const filteredOrders = selectedFilter === 'All' ? orders : orders.filter(order => order.deliveryType === selectedFilter);
@@ -171,6 +198,14 @@ const HomeRestaurant = () => {
     );
     setStatusModalVisible(false);
   };
+
+  if (loading) {
+    return (
+        <View style={styles.containerActivityIndicator}>
+            <ActivityIndicator size="large" color="#F5B000" />
+        </View>
+    );
+}
 
   return (
     <View style={styles.container}>
@@ -274,6 +309,13 @@ const HomeRestaurant = () => {
 export default HomeRestaurant;
 
 const styles = StyleSheet.create({
+  containerActivityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F0F0F0',
+    padding: 20,
+},
   container: {
     flex: 1,
     backgroundColor: '#f0f0f0',
