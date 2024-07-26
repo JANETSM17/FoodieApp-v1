@@ -19,9 +19,10 @@ const HistorialRestaurant = () => {
   const handleLoad = async () => {
     setLoading(true);
     try {
+      const userType = await AsyncStorage.getItem('@userType');
       const clientEmail = await AsyncStorage.getItem('clientEmail');
-      if (clientEmail) {
-        const orders = await getHistorialPedidos(clientEmail);
+      if (clientEmail && userType) {
+        const orders = await getHistorialPedidos(clientEmail, userType);
         setOrdersHistory(orders);
       }
     } catch (error) {

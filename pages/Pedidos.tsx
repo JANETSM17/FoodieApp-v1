@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Image, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getHistorialPedidos } from '../services/demoService'; 
 
 const pendingOrders = [
   {
@@ -33,74 +34,62 @@ const pendingOrders = [
   },
 ];
 
-const pastOrders = [
-  {
-    id: '4',
-    restaurant: 'Domino\'s Pizza',
-    date: '19/agosto/2023 10:59 am',
-    total: '$89',
-    image: require('../assets/images/restaurantes/Dominos_Logo.png'),
-  },
-  {
-    id: '5',
-    restaurant: 'Pizza Hut',
-    date: '19/agosto/2023 10:58 am',
-    total: '$28',
-    image: require('../assets/images/restaurantes/PizzaHot_Logo.png'),
-  },
-  {
-    id: '6',
-    restaurant: 'KFC',
-    date: '20/agosto/2023 12:00 pm',
-    total: '$45',
-    image: require('../assets/images/restaurantes/Dominos_Logo.png'), 
-  },
-  {
-    id: '7',
-    restaurant: 'Burger King',
-    date: '20/agosto/2023 1:15 pm',
-    total: '$35',
-    image: require('../assets/images/restaurantes/Dominos_Logo.png'), 
-  },
-  {
-    id: '8',
-    restaurant: 'Subway',
-    date: '21/agosto/2023 2:30 pm',
-    total: '$22',
-    image: require('../assets/images/restaurantes/Dominos_Logo.png'), 
-  },
-  {
-    id: '9',
-    restaurant: 'Starbucks',
-    date: '21/agosto/2023 3:45 pm',
-    total: '$18',
-    image: require('../assets/images/restaurantes/Dominos_Logo.png'), 
-  },
-];
-
 const Pedidos = ({ navigation }) => {
+  const [loading, setLoading] = useState(true);
+  const [pastOrders, setPastOrders] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalHistorialVisible, setModalHistVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  useEffect(() => {
+    handleLoad();
+  }, []);
+
+  const handleLoad = async () => {
+    setLoading(true);
+    try {
+      const userType = await AsyncStorage.getItem('@userType');
+      const clientEmail = await AsyncStorage.getItem('clientEmail');
+      if (clientEmail && userType) {
+        const response = await getHistorialPedidos(clientEmail, userType);
+        if (response && Array.isArray(response.res)) {
+          setPastOrders(response.res);
+        } else {
+          setPastOrders([]); // Asegúrate de establecer un array vacío si la respuesta no es un array
+          console.error('Expected an array, but got:', response);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setPastOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.containerActivityIndicator}>
+        <ActivityIndicator size="large" color="#F5B000" />
+      </View>
+    );
+  }
 
   const handlePendingOrderPress = (order) => {
     setSelectedOrder(order);
     setModalVisible(true);
   };
 
+  const handleHistorialOrderPress = (order) => {
+    if(order){
+      setSelectedOrder(order);
+    }
+    setModalHistVisible(true);
+  };
+
   const handleGoHome = () => {
     navigation.navigate('Home');
   };
-
-  const renderPastOrder = ({ item }) => (
-    <TouchableOpacity style={styles.orderHistoryItem}>
-      <Image source={item.image} style={styles.orderImage} />
-      <View>
-        <Text>{item.restaurant}</Text>
-        <Text>{item.date}</Text>
-        <Text>Total: {item.total}</Text>
-      </View>
-    </TouchableOpacity>
-  );
 
   return (
     <View style={styles.container}>
@@ -127,12 +116,16 @@ const Pedidos = ({ navigation }) => {
         <View style={styles.sectionTitleContainer}>
           <Text style={styles.sectionTitle}>Historial de Pedidos</Text>
         </View>
-        <FlatList
-          data={pastOrders}
-          renderItem={renderPastOrder}
-          keyExtractor={(item) => item.id}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-        />
+        {pastOrders.map((order) => (
+          <TouchableOpacity key={order._id} onPress={() => handleHistorialOrderPress(order)} style={styles.orderCard}>
+            <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.orderImage} />
+            <View>
+              <Text>{order.proveedor}</Text>
+              <Text>Fecha: {order.hora}</Text>
+              <Text>Total: {order.total}</Text>
+            </View>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
 
       {selectedOrder && (
@@ -144,23 +137,62 @@ const Pedidos = ({ navigation }) => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Detalles del Pedido</Text>
-              <Image source={selectedOrder.statusImage} style={styles.modalImage} />
-              <Text>Restaurante: {selectedOrder.restaurant}</Text>
+              <Image source={require('../assets/images/recursosExtras/BolsaCB.png')} style={styles.modalImage} />
+              <Text>Restaurant: {selectedOrder.restaurant}</Text>
               <Text>Precio: {selectedOrder.price}</Text>
               <Text>Estado: {selectedOrder.status}</Text>
-              <Text>Foodie-box: {selectedOrder.foodieBox}</Text>
-              <TouchableOpacity style={styles.modalCloseButton} onPress={() => setModalVisible(false)}>
+              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalCloseButton}>
                 <Text style={styles.modalCloseButtonText}>Cerrar</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
       )}
+
+      {selectedOrder && (
+        <Modal
+          transparent={true}
+          visible={modalHistorialVisible}
+          onRequestClose={() => setModalHistVisible(false)}
+        >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Detalles del Pedido</Text>
+            <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.modalImage} />
+                <Text style={styles.modalTextProveedor}>{selectedOrder.proveedor} </Text>
+                <Text style={styles.modalText}>Fecha y hora:</Text>
+                {selectedOrder.hora.split(',').map((item, index) => (
+                  <Text key={index} style={styles.modalItemText}>{item}</Text>
+                ))}
+                <Text style={styles.modalText}>Total:</Text>
+                <Text style={styles.modalItemText}>${selectedOrder.total}</Text>
+                <Text style={styles.modalText}>Productos:</Text>
+                {selectedOrder.descripcion.split(',').map((item, index) => (
+                  <Text key={index} style={styles.modalItemText}>{item}</Text>
+                ))}
+                <Text style={styles.modalText}>Especificaciones:</Text>
+                <Text style={styles.modalItemText}>{selectedOrder.especificaciones}</Text>
+                <Text style={styles.modalText}>Tipo de entrega:</Text>
+                <Text style={styles.modalItemText}>{selectedOrder.pickup === 'mostrador' ? 'Mostrador' : 'FoodieBox'}</Text>
+              <TouchableOpacity onPress={() => setModalHistVisible(false)} style={styles.modalCloseButton}>
+                <Text style={styles.modalCloseButtonText}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+        )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  containerActivityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F0F0F0',
+    padding: 20,
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -257,6 +289,20 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  modalTextProveedor: {
+    fontSize: 16,
+    margin: 2,
+    fontWeight: 'bold',
+  },
+  modalText: {
+    fontSize: 16,
+    margin: 2,
+  },
+  modalItemText: {
+    fontSize: 14,
+    margin: 5,
+    color: '#494949',
   },
   modalImage: {
     width: 60,

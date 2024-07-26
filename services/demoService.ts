@@ -719,7 +719,7 @@ async function sendPedido(idCarrito, espera, especificaciones, pickup, email) {
   }
 }
 
-async function getHistorialPedidos(email) {
+async function getHistorialPedidos(email, userType) {
   try {
     const authDataSerialize = await AsyncStorage.getItem('@authData');
     if (!authDataSerialize) {
@@ -727,7 +727,7 @@ async function getHistorialPedidos(email) {
     }
     const { token } = JSON.parse(authDataSerialize);
 
-    const response = await fetch(`${authHost}/getPedidosHist/${email}`, {
+    const response = await fetch(`${authHost}/getPedidosHist/${email}/${userType}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
