@@ -381,7 +381,7 @@ async function changePassword(previousPass, newPass, userType, id) {
   }
 }
 
-async function deleteAccount(password, id , userType) {
+async function deleteAccount(password, id , userType, email) {
   try {
     const authDataSerialize = await AsyncStorage.getItem('@authData');
     if (!authDataSerialize) {
@@ -389,7 +389,7 @@ async function deleteAccount(password, id , userType) {
     }
     const { token } = JSON.parse(authDataSerialize);
 
-    const response = await fetch(`${authHost}deleteAccount/${password}/${id}/${userType}`, {
+    const response = await fetch(`${authHost}deleteAccount/${password}/${id}/${userType}/${email}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -485,7 +485,7 @@ async function modifyQuantityProducto(idProducto, idCarrito, cantidad) {
   }
 }
 
-async function editInfoClient(nombre, telefono, userType, id) {
+async function editInfoClient(nombre, telefono, id) {
   try {
     const authDataSerialize = await AsyncStorage.getItem('@authData');
     if (!authDataSerialize) {
@@ -493,7 +493,7 @@ async function editInfoClient(nombre, telefono, userType, id) {
     }
     const { token } = JSON.parse(authDataSerialize);
 
-    const response = await fetch(`${authHost}editInfoClient/${nombre}/${telefono}/${userType}/${id}`, {
+    const response = await fetch(`${authHost}editInfoClient/${nombre}/${telefono}/${id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -501,13 +501,113 @@ async function editInfoClient(nombre, telefono, userType, id) {
       },
     });
 
+    const responseData = await response.json();
+    
     if (!response.ok) {
-      throw new Error("Error changing info");
+      throw new Error(responseData.message || "Error changing info");
     }
-    return response.json();
+
+    return responseData;
   } catch (error) {
     console.error("Error changing info:", error);
-    return { exists: false };
+    throw error; // Re-throw the error to be caught in handleEditInfo
+  }
+}
+
+async function editInfoProveedor(direccion, telefono, id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const encodedDireccion = encodeURIComponent(direccion);
+    const encodedTelefono = encodeURIComponent(telefono);
+    const encodedId = encodeURIComponent(id);
+
+    const response = await fetch(`${authHost}editInfoProveedor/${encodedDireccion}/${encodedTelefono}/${encodedId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      throw new Error(`Expected JSON, got: ${text}`);
+    }
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      throw new Error(responseData.message || "Error changing info");
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error("Error changing info:", error);
+    throw error; // Re-throw the error to be caught in handleEditInfo
+  }
+}
+
+async function editPrepTime(time, id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}editTimePreparation/${time}/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    const responseData = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(responseData.message || "Error changing info");
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error("Error changing info:", error);
+    throw error; // Re-throw the error to be caught in handleEditInfo
+  }
+}
+
+async function editClave(newClave, id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}editClave/${newClave}/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    const responseData = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(responseData.message || "Error changing info");
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error("Error changing info:", error);
+    throw error; // Re-throw the error to be caught in handleEditInfo
   }
 }
 
@@ -646,4 +746,4 @@ async function getHistorialPedidos(email) {
   }
 }
 
-export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword, deleteAccount, getProductos, deleteProducto, modifyQuantityProducto,editInfoClient, confirmFoodieBox, confirmPedido, confirmEspera, sendPedido, getHistorialPedidos };
+export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword, deleteAccount, getProductos, deleteProducto, modifyQuantityProducto,editInfoClient, confirmFoodieBox, confirmPedido, confirmEspera, sendPedido, getHistorialPedidos, editInfoProveedor, editPrepTime, editClave };

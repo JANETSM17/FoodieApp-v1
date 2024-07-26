@@ -77,7 +77,7 @@ const UserProfile = () => {
     console.log(userType);
     setLoading(true);
         try {
-            const deleted = await deleteAccount(deletePassword, id , userType);
+            const deleted = await deleteAccount(deletePassword, id , userType, email);
             if (deleted.status === 'success') {
               logout()
               setLoading(false);
@@ -92,21 +92,19 @@ const UserProfile = () => {
 
   const handleEditInfo = async () => {
     setLoading(true);
-        try {
-            const changed = await editInfoClient(nombre, phone, userType, id);
-            if (changed.status === 'success') {
-              Alert.alert('Información actualizada con éxito');
-            }
-
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            Alert.alert('Error al actualizar información');
-        } finally {
-            setEditInfoModalVisible(false);
-            setLoading(false);
-        }
-    
+    try {
+      const changed = await editInfoClient(nombre, phone, id);
+      if (changed.status === 'success') {
+        Alert.alert('Información actualizada con éxito');
+      }
+    } catch (error) {
+      Alert.alert('Error al actualizar información', error.message || 'Error desconocido');
+    } finally {
+      setEditInfoModalVisible(false);
+      setLoading(false);
+    }
   };
+  
 
   if (loading) {
     return (

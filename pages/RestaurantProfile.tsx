@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 import useAuth from '../hooks/useAuth'; 
-import { changePassword, getUserInfo, deleteAccount, editInfoClient } from '../services/demoService';
+import { changePassword, getUserInfo, deleteAccount, editInfoClient, editInfoProveedor, editPrepTime, editClave } from '../services/demoService';
 
 const RestaurantProfile = () => {
   const [loading, setLoading] = useState(true);
@@ -80,7 +80,7 @@ const RestaurantProfile = () => {
     console.log(userType);
     setLoading(true);
         try {
-            const deleted = await deleteAccount(deletePassword, id , userType);
+            const deleted = await deleteAccount(deletePassword, id , userType, email);
             if (deleted.status === 'success') {
               logout()
               setLoading(false);
@@ -95,53 +95,61 @@ const RestaurantProfile = () => {
 
   const handleEditInfo = async () => {
     setLoading(true);
-        try {
-            const changed = await editInfoClient(name, phone, userType, id);
-            if (changed.status === 'success') {
-              Alert.alert('Información actualizada con éxito');
-            }
-
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            Alert.alert('Error al actualizar información');
-        } finally {
-            setEditInfoModalVisible(false);
-            setLoading(false);
-        }
-  };
+    try {
+      const changed = await editInfoProveedor(address, phone, id);
+      if (changed.status === 'success') {
+        Alert.alert('Información actualizada con éxito');
+      }
+    } catch (error) {
+      Alert.alert('Error al actualizar información', error.message || 'Error desconocido');
+    } finally {
+      handleLoad()
+      setEditInfoModalVisible(false);
+    }
+  };  
 
   const handleEditPrepTime = async () => {
     setLoading(true);
         try {
-            const changed = await editInfoClient(prepTime, userType, id);
+            const changed = await editPrepTime(prepTime, id);
             if (changed.status === 'success') {
               Alert.alert('Tiempo de preparación actualizado con éxito');
             }
 
         } catch (error) {
             console.error('Error fetching data:', error);
-            Alert.alert('Error al actualizar tiempo de preparación');
+            Alert.alert('Error al actualizar información', error.message || 'Error desconocido');
         } finally {
+            handleLoad()
             setEditPrepTimeModalVisible(false);
-            setLoading(false);
         }
   };
-
+  
   const handleEditCode = async () => {
     setLoading(true);
-        try {
-            const changed = await editInfoClient(code, userType, id);
-            if (changed.status === 'success') {
-              Alert.alert('Código de comedor actualizado con éxito');
-            }
 
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            Alert.alert('Error al actualizar código de comedor');
-        } finally {
-            setEditCodeModalVisible(false);
-            setLoading(false);
-        }
+    if (code.length !== 6) {
+      setLoading(false);
+      Alert.alert('Error', 'El código debe tener exactamente 6 caracteres.');
+      return;
+    }
+
+      try {
+        const changed = await editClave(code, id);
+        if (changed.status === 'success') {
+              Alert.alert('Clave actualizada con éxito');
+          }
+      } catch (error) {
+        Alert.alert('Error al actualizar la clave', error.message || 'Error desconocido');
+      } finally {
+        handleLoad()
+        setEditCodeModalVisible(false);
+      }
+  };
+
+  const handleCodeChange = (text) => {
+    const formattedText = text.toUpperCase().slice(0, 6);
+    setComedorCode(formattedText);
   };
 
   if (loading) {
@@ -344,6 +352,7 @@ const RestaurantProfile = () => {
               placeholder="Tiempo de preparación"
               value={prepTime}
               onChangeText={setPrepTime}
+              keyboardType="numeric"
             />
             <TouchableOpacity style={styles.modalButton} onPress={handleEditPrepTime}>
               <Text style={styles.modalButtonText}>Guardar</Text>
@@ -368,7 +377,8 @@ const RestaurantProfile = () => {
               style={styles.input}
               placeholder="Código de Comedor"
               value={code}
-              onChangeText={setComedorCode}
+              onChangeText={handleCodeChange}
+              maxLength={6}
             />
             <TouchableOpacity style={styles.modalButton} onPress={handleEditCode}>
               <Text style={styles.modalButtonText}>Guardar</Text>

@@ -60,8 +60,20 @@ function HomePage() {
         navigation.navigate('Pedidos');
     };
 
+    const handleCodeChange = (text) => {
+        const formattedText = text.toUpperCase().slice(0, 6);
+        setComedorCode(formattedText);
+      };
+
     const handleAddComedor = async () => {
         setLoading(true);
+
+        if (comedorCode.length !== 6) {
+            setLoading(false);
+            Alert.alert('Error', 'El código debe tener exactamente 6 caracteres.');
+            return;
+          }
+
         const result = await addComedor(comedorCode);
         if (result) {
             setComedorCode('');
@@ -154,7 +166,8 @@ function HomePage() {
                             style={styles.modalInput}
                             placeholder="[xxxxxx]"
                             value={comedorCode}
-                            onChangeText={setComedorCode}
+                            onChangeText={handleCodeChange}
+                            maxLength={6}
                         />
                         <TouchableOpacity style={styles.addButton} onPress={handleAddComedor}>
                             <Text style={styles.addButtonText}>Agregar comedor</Text>

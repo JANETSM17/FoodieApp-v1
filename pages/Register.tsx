@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator} from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Image, ActivityIndicator, Alert} from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Asegúrate de tener instalado @expo/vector-icons
 import { authHost } from "../constants/auth.constants";
 
@@ -66,6 +66,7 @@ const Register = ({ route, navigation }) => {
         }); // Redirige al login después de registrarse
       } else {
         console.log('Error', data.message || 'Error al registrar el usuario');
+        Alert.alert('Error', data.message || 'Error al registrar el usuario');
       }
     } catch (error) {
       console.log('Error', 'No se pudo conectar con el servidor');
