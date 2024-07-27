@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 import useAuth from '../hooks/useAuth'; 
-import { changePassword, getUserInfo, deleteAccount, editInfoClient, editInfoProveedor, editPrepTime, editClave } from '../services/demoService';
+import { changePassword, getUserInfo, deleteAccount, editInfoProveedor, editPrepTime, editClave, updateEstatusComedor } from '../services/demoService';
 
 const RestaurantProfile = () => {
   const [loading, setLoading] = useState(true);
@@ -12,7 +12,7 @@ const RestaurantProfile = () => {
   const [isEditInfoModalVisible, setEditInfoModalVisible] = useState(false);
   const [isEditPrepTimeModalVisible, setEditPrepTimeModalVisible] = useState(false);
   const [isEditCodeModalVisible, setEditCodeModalVisible] = useState(false);
-  const [isEnabled, setIsEnabled] = useState(false); 
+  const [isEnabled, setIsEnabled] = useState(false);
   const [name, setName] = useState('Wendys');
   const [code, setComedorCode] = useState('AS98DF2');
   const [email, setEmail] = useState('wendys@foodie.com');
@@ -28,9 +28,22 @@ const RestaurantProfile = () => {
   const [deletePassword, setDeletePassword] = useState('');
   const [id, setID] = useState('');
   const [userType, setUserType] = useState('');
-
   const toggleFaqVisibility = () => setIsFaqVisible(!isFaqVisible);
-  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+
+  const toggleSwitch = async () => {
+    setLoading(true)
+    console.log(isEnabled)
+    const newState = !isEnabled
+    console.log('NewState:', newState)
+    try {
+      const changed = await updateEstatusComedor(newState, id);
+  } catch (error) {
+      console.error('Error fetching data:', error);
+      Alert.alert('Trono', error.message || 'Error desconocido');
+  } finally {
+      handleLoad()
+  }
+  };
 
   useEffect(() => {
     handleLoad();
@@ -49,6 +62,9 @@ const RestaurantProfile = () => {
               setPrepTime(clientInfo.min_espera);
               setComedorCode(clientInfo.clave)
               setID(clientInfo._id)
+              setIsEnabled(clientInfo.active)
+              console.log('ESTA isEnabled: ', isEnabled)
+              console.log('ESTA clientInfo.active: ', clientInfo.active)
           }
             setUserType('proveedores');
 
@@ -239,13 +255,17 @@ const RestaurantProfile = () => {
         {/* Estado del Comedor */}
         <View style={styles.infoCard}>
           <Text style={styles.sectionTitle}>Estado del comedor:</Text>
+          <View style={styles.switchContainer}>
           <Switch
-            trackColor={{ false: '#767577', true: '#81b0ff' }}
-            thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+            style={styles.switch}
+            trackColor={{ false: '#767577', true: '#FFD659' }}
+            thumbColor={isEnabled ? '#ffc107' : '#f4f3f4'}
             ios_backgroundColor="#3e3e3e"
             onValueChange={toggleSwitch}
             value={isEnabled}
           />
+          </View>
+          <Text style={styles.infoText}>{isEnabled === false ? 'Cerrado' : 'Abierto'}</Text>
         </View>
 
         <TouchableOpacity style={styles.actionButton} onPress={() => setChangePasswordModalVisible(true)}>
@@ -490,6 +510,11 @@ const styles = StyleSheet.create({
   icon: {
     marginRight: 10,
   },
+  infoTextDesactivado: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   infoText: {
     fontSize: 16,
     fontWeight: 'bold',
@@ -602,5 +627,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 15,
     textAlign: 'center',
+  },
+  switchContainer: {
+    alignItems: 'center', // Center Switch horizontally
+    marginBottom: 10,
+  },
+  switch: {
+    transform: [{ scaleX: 1.5 }, { scaleY: 1.5}], // Increase size
   },
 });
