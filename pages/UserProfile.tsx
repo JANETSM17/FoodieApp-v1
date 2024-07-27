@@ -31,8 +31,8 @@ const UserProfile = () => {
   const handleLoad = async () => {
       setLoading(true);
       try {
-          const clientInfo = await getUserInfo();
-          if (clientInfo) {
+          const clientInfo = await getUserInfo(); 
+         if (clientInfo) {
               setEmail(clientInfo.correo);
               setNombre(clientInfo.nombre);
               setPhone(clientInfo.telefono);

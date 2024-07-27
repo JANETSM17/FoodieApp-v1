@@ -2,44 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getHistorialPedidos } from '../services/demoService'; 
-
-const pendingOrders = [
-  {
-    id: '1',
-    restaurant: 'Cafeteria UTCH BIS',
-    price: '$250',
-    status: 'Solicitud enviada',
-    image: require('../assets/images/restaurantes/utch_logo.png'),
-    statusImage: require('../assets/images/recursosExtras/bolsaB.png'),
-    foodieBox: '1k212',
-  },
-  {
-    id: '2',
-    restaurant: 'Domino\'s Pizza',
-    price: '$89',
-    status: 'Preparando',
-    image: require('../assets/images/restaurantes/Dominos_Logo.png'),
-    statusImage: require('../assets/images/recursosExtras/bolsaRB.png'),
-    foodieBox: '2d345',
-  },
-  {
-    id: '3',
-    restaurant: 'Pizza Hut',
-    price: '$28',
-    status: 'Listo para recoger',
-    image: require('../assets/images/restaurantes/PizzaHot_Logo.png'),
-    statusImage: require('../assets/images/recursosExtras/BolsaCB.png'),
-    foodieBox: '3c678',
-  },
-];
+import { getHistorialPedidos, getPedidosEnCurso, getUserInfo } from '../services/demoService'; 
 
 const Pedidos = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [pastOrders, setPastOrders] = useState([]);
+  const [pendingOrders, setPendingOrders] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalHistorialVisible, setModalHistVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedOrderPending, setSelectedOrderPending] = useState(null);
 
   useEffect(() => {
     handleLoad();
@@ -48,6 +20,7 @@ const Pedidos = ({ navigation }) => {
   const handleLoad = async () => {
     setLoading(true);
     try {
+      const clientInfo = await getUserInfo();
       const userType = await AsyncStorage.getItem('@userType');
       const clientEmail = await AsyncStorage.getItem('clientEmail');
       if (clientEmail && userType) {
@@ -59,9 +32,20 @@ const Pedidos = ({ navigation }) => {
           console.error('Expected an array, but got:', response);
         }
       }
+
+      if (clientEmail && clientInfo) {
+        const pedidosEnCursoResponse = await getPedidosEnCurso(clientEmail, clientInfo._id);
+        if (pedidosEnCursoResponse && Array.isArray(pedidosEnCursoResponse)) {
+          setPendingOrders(pedidosEnCursoResponse);
+        } else {
+          setPendingOrders([]); // Asegúrate de establecer un array vacío si la respuesta no es un array
+          console.error('Expected an array, but got:', pedidosEnCursoResponse);
+        }
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
       setPastOrders([]);
+      setPendingOrders([]);
     } finally {
       setLoading(false);
     }
@@ -76,7 +60,9 @@ const Pedidos = ({ navigation }) => {
   }
 
   const handlePendingOrderPress = (order) => {
-    setSelectedOrder(order);
+    if(order){
+      setSelectedOrderPending(order);
+    }
     setModalVisible(true);
   };
 
@@ -106,10 +92,10 @@ const Pedidos = ({ navigation }) => {
         </View>
         {pendingOrders.map((order) => (
           <TouchableOpacity key={order.id} onPress={() => handlePendingOrderPress(order)} style={styles.orderCard}>
-            <Image source={order.image} style={styles.orderImage} />
+            <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.orderImage} />
             <View>
-              <Text style={styles.orderRestaurant}>{order.restaurant}</Text>
-              <Text style={styles.orderPrice}>{order.price}</Text>
+              <Text style={styles.orderRestaurant}>{order.nombre}</Text>
+              <Text style={styles.orderPrice}>Total: ${order.total}</Text>
             </View>
           </TouchableOpacity>
         ))}
@@ -120,15 +106,14 @@ const Pedidos = ({ navigation }) => {
           <TouchableOpacity key={order._id} onPress={() => handleHistorialOrderPress(order)} style={styles.orderCard}>
             <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.orderImage} />
             <View>
-              <Text>{order.proveedor}</Text>
-              <Text>Fecha: {order.hora}</Text>
-              <Text>Total: {order.total}</Text>
+              <Text style={styles.orderRestaurant}>{order.proveedor}</Text>
+              <Text style={styles.orderPrice}>Total: ${order.total}</Text>
             </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
-      {selectedOrder && (
+      {selectedOrderPending && (
         <Modal
           transparent={true}
           visible={modalVisible}
@@ -138,9 +123,27 @@ const Pedidos = ({ navigation }) => {
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Detalles del Pedido</Text>
               <Image source={require('../assets/images/recursosExtras/BolsaCB.png')} style={styles.modalImage} />
-              <Text>Restaurant: {selectedOrder.restaurant}</Text>
-              <Text>Precio: {selectedOrder.price}</Text>
-              <Text>Estado: {selectedOrder.status}</Text>
+              <Text style={styles.modalTextProveedor}>{selectedOrderPending.nombre} </Text>
+                <Text style={styles.modalText}>Número Pedido:</Text>
+                <Text style={styles.modalItemText}>{selectedOrderPending.id}</Text>
+                <Text style={styles.modalText}>Estatus:</Text>
+                <Text style={styles.modalItemText}>{selectedOrderPending.status}</Text>
+                <Text style={styles.modalText}>Fecha y hora:</Text>
+                {selectedOrderPending.entrega.split(',').map((item, index) => (
+                  <Text key={index} style={styles.modalItemText}>{item}</Text>
+                ))}
+                <Text style={styles.modalText}>Total:</Text>
+                <Text style={styles.modalItemText}>${selectedOrderPending.total}</Text>
+                <Text style={styles.modalText}>Descripción:</Text>
+                {selectedOrderPending.descripcion.split(',').map((item, index) => (
+                  <Text key={index} style={styles.modalItemText}>{item}</Text>
+                ))}
+                <Text style={styles.modalText}>Especificaciones:</Text>
+                <Text style={styles.modalItemText}>{selectedOrderPending.especificaciones}</Text>
+                <Text style={styles.modalText}>Tipo de entrega:</Text>
+                <Text style={styles.modalItemText}>{selectedOrderPending.pickup}</Text>
+                <Text style={styles.modalText}>Clave FoodieBox:</Text>
+                <Text style={styles.modalItemText}>{selectedOrderPending.clave}</Text>
               <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalCloseButton}>
                 <Text style={styles.modalCloseButtonText}>Cerrar</Text>
               </TouchableOpacity>
