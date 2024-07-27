@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView, Modal, TextInput, Alert, ActivityIndicator, Switch } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
@@ -12,6 +12,7 @@ const RestaurantProfile = () => {
   const [isEditInfoModalVisible, setEditInfoModalVisible] = useState(false);
   const [isEditPrepTimeModalVisible, setEditPrepTimeModalVisible] = useState(false);
   const [isEditCodeModalVisible, setEditCodeModalVisible] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(false); 
   const [name, setName] = useState('Wendys');
   const [code, setComedorCode] = useState('AS98DF2');
   const [email, setEmail] = useState('wendys@foodie.com');
@@ -29,6 +30,7 @@ const RestaurantProfile = () => {
   const [userType, setUserType] = useState('');
 
   const toggleFaqVisibility = () => setIsFaqVisible(!isFaqVisible);
+  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
   useEffect(() => {
     handleLoad();
@@ -232,6 +234,18 @@ const RestaurantProfile = () => {
               </View>
             </View>
           )}
+        </View>
+
+        {/* Estado del Comedor */}
+        <View style={styles.infoCard}>
+          <Text style={styles.sectionTitle}>Estado del comedor:</Text>
+          <Switch
+            trackColor={{ false: '#767577', true: '#81b0ff' }}
+            thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={toggleSwitch}
+            value={isEnabled}
+          />
         </View>
 
         <TouchableOpacity style={styles.actionButton} onPress={() => setChangePasswordModalVisible(true)}>
