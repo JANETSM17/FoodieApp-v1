@@ -12,6 +12,7 @@ const Pedidos = ({ navigation }) => {
   const [modalHistorialVisible, setModalHistVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedOrderPending, setSelectedOrderPending] = useState(null);
+  const [totalSpent, setTotalSpent] = useState('$368');
 
   useEffect(() => {
     handleLoad();
@@ -27,6 +28,7 @@ const Pedidos = ({ navigation }) => {
         const response = await getHistorialPedidos(clientEmail, userType);
         if (response && Array.isArray(response.res)) {
           setPastOrders(response.res);
+          setTotalSpent(response.total)
         } else {
           setPastOrders([]); // Asegúrate de establecer un array vacío si la respuesta no es un array
           console.error('Expected an array, but got:', response);
@@ -102,6 +104,11 @@ const Pedidos = ({ navigation }) => {
         <View style={styles.sectionTitleContainer}>
           <Text style={styles.sectionTitle}>Historial de Pedidos</Text>
         </View>
+        <View style={styles.divider} />
+        <Text style={styles.detailText}>
+          Total gastado: <Text style={styles.orangeText}>${totalSpent}</Text>
+        </Text>
+        <View style={styles.divider} />
         {pastOrders.map((order) => (
           <TouchableOpacity key={order._id} onPress={() => handleHistorialOrderPress(order)} style={styles.orderCard}>
             <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.orderImage} />
@@ -323,6 +330,19 @@ const styles = StyleSheet.create({
   modalCloseButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  detailText: {
+    fontSize: 16,
+    color: 'black',
+    fontWeight: 'bold',
+  },
+  orangeText: {
+    color: 'orange',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#ddd',
+    margin: 10,
   },
 });
 

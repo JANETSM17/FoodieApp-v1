@@ -19,7 +19,6 @@ const UserProfile = () => {
   const [image, setImage] = useState(''); //por ahora no la usamos hasta agregar cloudinary
   const [joinDate, setJoinDate] = useState('');
   const [id, setID] = useState('');
-  const [totalSpent, setTotalSpent] = useState('$368');
   const navigation = useNavigation();
   const { logout } = useAuth(); 
   const [userType, setUserType] = useState('');
@@ -149,10 +148,7 @@ const UserProfile = () => {
         <Text style={styles.detailText}>
           Te uniste el: <Text style={styles.orangeText}>{joinDate}</Text>
         </Text>
-        <View style={styles.divider} />
-        <Text style={styles.detailText}>
-          Total gastado: <Text style={styles.orangeText}>{totalSpent}</Text>
-        </Text>
+        
       </View>
 
       <TouchableOpacity style={styles.actionButton} onPress={() => setChangePasswordModalVisible(true)}>
