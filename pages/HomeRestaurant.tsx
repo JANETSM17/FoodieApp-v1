@@ -6,6 +6,57 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUserInfo } from '../services/demoService';
 
+const ordersToAccept = [
+  {
+    id: 7,
+    customerName: 'Mike Tyson',
+    orderNumber: 27,
+    phoneNumber: '(614)-216-78-27',
+    items: [
+      '2x Pizza Piña',
+      '1x Hamburguesa',
+      '4x Coca-Cola',
+    ],
+    specifications: 'Sin especificaciones',
+    total: 250,
+    pickupTime: '11:59 am',
+    deliveryType: 'Foodie-Box',
+    status: 'Esperando confirmacion'
+  },
+  {
+    id: 8,
+    customerName: 'Mike Tyson',
+    orderNumber: 28,
+    phoneNumber: '(614)-216-78-27',
+    items: [
+      '2x Pizza Piña',
+      '1x Hamburguesa',
+      '4x Coca-Cola',
+    ],
+    specifications: 'Sin especificaciones',
+    total: 250,
+    pickupTime: '11:59 am',
+    deliveryType: 'Pick-Up',
+    status: 'Esperando confirmacion'
+  },
+  {
+    id: 9,
+    customerName: 'Mike Tyson',
+    orderNumber: 29,
+    phoneNumber: '(614)-216-78-27',
+    items: [
+      '2x Pizza Piña',
+      '1x Hamburguesa',
+      '4x Coca-Cola',
+    ],
+    specifications: 'Sin especificaciones',
+    total: 250,
+    pickupTime: '11:59 am',
+    deliveryType: 'Foodie-Box',
+    status: 'Esperando confirmacion'
+  },
+];
+
 const ordersInProgress = [
   {
     id: 1,
@@ -21,7 +72,7 @@ const ordersInProgress = [
     total: 250,
     pickupTime: '11:59 am',
     deliveryType: 'Foodie-Box',
-    status: 'Solicitud Enviada'
+    status: 'Preparando'
   },
   {
     id: 2,
@@ -53,7 +104,7 @@ const ordersInProgress = [
     total: 250,
     pickupTime: '11:59 am',
     deliveryType: 'Foodie-Box',
-    status: 'Listo para recoger'
+    status: 'Preparando'
   },
 ];
 
@@ -111,7 +162,7 @@ const ordersReady = [
 const HomeRestaurant = () => {
   const { logout } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [selectedTab, setSelectedTab] = useState('InProgress');
+  const [selectedTab, setSelectedTab] = useState('ToAccept');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -159,18 +210,48 @@ const handleLoad = async () => {
         </View>
         <Text style={styles.totalText}>Total: <Text style={styles.boldText}>${order.total}</Text></Text>
         <Text style={styles.pickupTimeText}>Hora de Pick-up: {order.pickupTime}</Text>
-        {selectedTab === 'InProgress' ? (
-          <TouchableOpacity style={styles.statusButton} onPress={() => handleStatusPress(order)}>
-            <Text style={styles.statusButtonText}>{order.status}</Text>
-          </TouchableOpacity>
-        ) : (
-          <>
-            <Text style={styles.statusReadyText}>{order.status}</Text>
-            <TouchableOpacity style={styles.sendButton}>
-              <Text style={styles.sendButtonText}>Enviar</Text>
+        {selectedTab === 'ToAccept' && (
+        <>
+          <Text style={styles.statusReadyText}>Estatus: {order.status}</Text>
+          <View style={styles.acceptRejectContainer}>
+            <TouchableOpacity style={styles.acceptButton}>
+              <Text style={styles.acceptRejectButtonText}>Aceptar</Text>
             </TouchableOpacity>
-          </>
-        )}
+            <TouchableOpacity style={styles.rejectButton}>
+              <Text style={styles.acceptRejectButtonText}>Rechazar</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+      {selectedTab === 'InProgress' && (
+        <>
+          <Text style={styles.statusReadyText}>Estatus: {order.status}</Text>
+          {order.deliveryType === 'Foodie-Box' ? (
+            <View style={styles.foodieBoxContainer}>
+              <Text style={styles.foodieBoxText}>Al terminar lleva a la FoodieBox</Text>
+            </View>
+          ) : (
+            <TouchableOpacity style={styles.readyButton}>
+              <Text style={styles.readyButtonText}>Pasar a listo</Text>
+            </TouchableOpacity>
+          )}
+        </>
+      )}
+      {selectedTab === 'Ready' && (
+        <>
+          <Text style={styles.statusReadyText}>Estatus: {order.status}</Text>
+          {order.deliveryType === 'Foodie-Box' ? (
+            <View style={styles.foodieBoxContainer}>
+              <Text style={styles.foodieBoxText}>En FoodieBox</Text>
+            </View>
+          ) : (
+            <TouchableOpacity style={styles.deliveredButton}>
+              <Text style={styles.deliveredButtonText}>Entregado</Text>
+            </TouchableOpacity>
+          )}
+        </>
+      )}
+        
       </TouchableOpacity>
     ));
   };
@@ -230,11 +311,14 @@ const handleCloseAddProductModal = () => {
         <View style={{ width: 40 }} />
       </View>
       <View style={styles.tabContainer}>
+      <TouchableOpacity style={[styles.tabButton, selectedTab === 'ToAccept' && styles.activeTab]} onPress={() => setSelectedTab('ToAccept')}>
+          <Text style={[styles.tabText, selectedTab === 'ToAccept' && styles.activeTabText]}>Por aceptar</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={[styles.tabButton, selectedTab === 'InProgress' && styles.activeTab]} onPress={() => setSelectedTab('InProgress')}>
-          <Text style={[styles.tabText, selectedTab === 'InProgress' && styles.activeTabText]}>Pedidos en curso</Text>
+          <Text style={[styles.tabText, selectedTab === 'InProgress' && styles.activeTabText]}>En curso</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.tabButton, selectedTab === 'Ready' && styles.activeTab]} onPress={() => setSelectedTab('Ready')}>
-          <Text style={[styles.tabText, selectedTab === 'Ready' && styles.activeTabText]}>Pedidos listos</Text>
+          <Text style={[styles.tabText, selectedTab === 'Ready' && styles.activeTabText]}>Listos</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.filterContainer}>
@@ -249,6 +333,7 @@ const handleCloseAddProductModal = () => {
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.content}>
+        {selectedTab === 'ToAccept' && renderOrders(ordersToAccept)}
         {selectedTab === 'InProgress' && renderOrders(orders)}
         {selectedTab === 'Ready' && renderOrders(ordersReady)}
       </ScrollView>
@@ -268,42 +353,18 @@ const handleCloseAddProductModal = () => {
               {selectedOrder.items.map((item, index) => (
                 <Text key={index} style={styles.modalItemText}>{item}</Text>
               ))}
-              <View style={styles.modalButtonsContainer}>
-                <TouchableOpacity style={styles.modalButton} onPress={handleCloseModal}>
-                  <Text style={styles.modalButtonText}>OK</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.modalButtonCancel} onPress={handleCancelOrder}>
-                  <Text style={styles.modalButtonText}>Cancelar pedido</Text>
+              <Text style={styles.modalText}>Especificaciones: {selectedOrder.specifications}</Text>
+              <Text style={styles.modalText}>Total: ${selectedOrder.total}</Text>
+              <Text style={styles.modalText}>Hora de Pick-up: {selectedOrder.pickupTime}</Text>
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity style={styles.modalButtonClose} onPress={handleCloseModal}>
+                  <Text style={styles.modalButtonText}>Cerrar</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         </Modal>
       )}
-      <Modal
-        transparent={true}
-        animationType="fade"
-        visible={statusModalVisible}
-        onRequestClose={() => setStatusModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Cambiar Estado</Text>
-            <TouchableOpacity style={styles.statusOption} onPress={() => handleStatusChange('Solicitud Enviada')}>
-              <Text style={styles.statusOptionText}>Solicitud Enviada</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.statusOption} onPress={() => handleStatusChange('Preparando')}>
-              <Text style={styles.statusOptionText}>Preparando</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.statusOption} onPress={() => handleStatusChange('Listo para recoger')}>
-              <Text style={styles.statusOptionText}>Listo para recoger</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.modalButtonCancel} onPress={() => setStatusModalVisible(false)}>
-              <Text style={styles.modalButtonText}>Cancelar pedido</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
       <View style={styles.navBar}>
         <TouchableOpacity onPress={() => navigation.navigate('MenuRestaurant')} style={styles.navButton}>
           <Ionicons name="restaurant-outline" size={30} color="#FFFFFF" />
@@ -480,18 +541,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 5,
   },
-  statusButton: {
-    backgroundColor: 'black',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  statusButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
   statusReadyText: {
     fontSize: 14,
     fontWeight: 'bold',
@@ -536,11 +585,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 5,
   },
-  modalButtonsContainer: {
+  modalButtonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginTop: 20,
+    justifyContent: 'space-between',
+    marginTop: 16,
   },
   modalButton: {
     backgroundColor: '#FFA500',
@@ -648,5 +696,72 @@ const styles = StyleSheet.create({
   addProductModalButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  acceptRejectContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  acceptButton: {
+    backgroundColor: '#FFA500',
+    borderRadius: 8,
+    padding: 8,
+    flex: 1,
+    marginRight: 4,
+    alignItems: 'center',
+  },
+  rejectButton: {
+    backgroundColor: '#aaa',
+    borderRadius: 8,
+    padding: 8,
+    flex: 1,
+    marginLeft: 4,
+    alignItems: 'center',
+  },
+  acceptRejectButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  foodieBoxContainer: {
+    backgroundColor: '#aaa',
+    borderRadius: 8,
+    padding: 8,
+    alignItems: 'center',
+    marginTop: 9,
+  },
+  foodieBoxText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  readyButton: {
+    backgroundColor: '#FFA500',
+    borderRadius: 8,
+    padding: 8,
+    alignItems: 'center',
+    marginTop: 9,
+  },
+  readyButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  deliveredButton: {
+    backgroundColor: '#FFA500',
+    borderRadius: 8,
+    padding: 8,
+    alignItems: 'center',
+    marginTop: 9,
+  },
+  deliveredButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  modalButtonClose: {
+    backgroundColor: '#007bff',
+    borderRadius: 8,
+    padding: 8,
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 4,
   },
 });
