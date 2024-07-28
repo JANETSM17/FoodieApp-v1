@@ -16,8 +16,11 @@ function HomePage() {
     const contentMargin = 20; 
 
     useEffect(() => {
+        const loadInterval = setInterval(handleLoad, 60000); // 300000 ms = 5 minutos
         handleLoad();
-    }, []);
+    
+        return () => clearInterval(loadInterval);
+      }, []);
 
     const handleLoad = async () => {
         setLoading(true);
