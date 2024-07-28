@@ -279,9 +279,6 @@ const handleCloseAddProductModal = () => {
         <TouchableOpacity onPress={() => navigation.navigate('MenuRestaurant')} style={styles.navButton}>
           <Ionicons name="restaurant-outline" size={30} color="#FFFFFF" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleAddProductPress} style={styles.navButton}>
-          <Ionicons name="add-circle-outline" size={30} color="#FFA500" />
-        </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('HistorialRestaurant')} style={styles.navButton}>
           <Ionicons name="time-outline" size={30} color="#FFFFFF" />
         </TouchableOpacity>
