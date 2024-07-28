@@ -28,16 +28,18 @@ function AuthProvider({ children }) {
 
   async function login(email, password) {
     setLoading(true);
-    //const _user = await authService(email, password);
-    //setUser(_user);
     const response = await authService(email, password);
-    const { token, userType } = response;
-    setUser({ token });
-    if (token && userType) {
+    
+    if (response && response.token && response.userType) {
+      const { token, userType } = response;
+      setUser({ token });
       await AsyncStorage.setItem("@authData", JSON.stringify({ token }));
       await AsyncStorage.setItem("@userType", userType);
       console.log({ token, userType });
+    } else {
+      setUser(undefined); // Reiniciar el estado de usuario si hay error
     }
+
     setLoading(false);
   }
 
@@ -46,6 +48,9 @@ function AuthProvider({ children }) {
     setUser(undefined);
     await AsyncStorage.removeItem("@authData");
     await AsyncStorage.removeItem("@userType");
+    await AsyncStorage.removeItem("carritoID");
+    await AsyncStorage.removeItem("clientEmail");
+    await AsyncStorage.removeItem("selectedComedorId");
     setLoading(false);
   }
 

@@ -171,7 +171,7 @@ const Pedidos = ({ navigation }) => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Detalles del Pedido</Text>
-            <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.modalImage} />
+            <Image source={{ uri: selectedOrder.ruta }} style={styles.modalImage} />
                 <Text style={styles.modalTextProveedor}>{selectedOrder.proveedor} </Text>
                 <Text style={styles.modalText}>Fecha y hora:</Text>
                 {selectedOrder.hora.split(',').map((item, index) => (

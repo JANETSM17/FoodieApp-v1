@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Modal, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import RNPickerSelect from 'react-native-picker-select';
+import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { confirmFoodieBox, confirmPedido, getProductos, confirmEspera, sendPedido, getCarritoID } from '../services/demoService'; // Ajusta el path según corresponda
 
@@ -220,31 +220,27 @@ const BagFinalDetails = () => {
           <View style={styles.timeModalContent}>
             <Text style={styles.modalTitle}>Selecciona la hora</Text>
             <View style={styles.pickerContainer}>
-              <RNPickerSelect
-                onValueChange={(value) => setHour(value)}
-                items={hours}
-                style={pickerSelectStyles}
-                placeholder={{
-                  label: 'HH',
-                  value: null,
-                  color: '#888',
-                }}
-                value={hour}
-                useNativeAndroidPickerStyle={false}
-              />
+            <Picker
+                selectedValue={hour}
+                style={styles.picker}
+                onValueChange={(itemValue) => setHour(itemValue)}
+              >
+                <Picker.Item label="HH" value={null} color="#888" />
+                {hours.map((hour) => (
+                  <Picker.Item key={hour.value} label={hour.label} value={hour.value} />
+                ))}
+              </Picker>
               <Text style={styles.colon}>:</Text>
-              <RNPickerSelect
-                onValueChange={(value) => setMinute(value)}
-                items={minutes}
-                style={pickerSelectStyles}
-                placeholder={{
-                  label: 'MM',
-                  value: null,
-                  color: '#888',
-                }}
-                value={minute}
-                useNativeAndroidPickerStyle={false}
-              />
+              <Picker
+                selectedValue={minute}
+                style={styles.picker}
+                onValueChange={(itemValue) => setMinute(itemValue)}
+              >
+                <Picker.Item label="MM" value={null} color="#888" />
+                {minutes.map((minute) => (
+                  <Picker.Item key={minute.value} label={minute.label} value={minute.value} />
+                ))}
+              </Picker>
             </View>
             <TouchableOpacity
               style={styles.confirmButton}
@@ -425,28 +421,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
   },
-});
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
+  picker: {
+    width: 100,
     fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 4,
-    color: 'black',
-    paddingRight: 30, // to ensure the text is never behind the icon
-  },
-  inputAndroid: {
-    fontSize: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
     borderWidth: 0.5,
-    borderColor: 'purple',
-    borderRadius: 8,
+    borderColor: 'orange',
     color: 'black',
-    paddingRight: 30, // to ensure the text is never behind the icon
   },
 });
 

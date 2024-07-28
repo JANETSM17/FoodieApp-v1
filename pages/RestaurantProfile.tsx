@@ -82,6 +82,8 @@ const RestaurantProfile = () => {
         try {
             const changed = await changePassword(oldPassword, newPassword, userType, id);
             if (changed.status === 'success') {
+              setOldPassword('');
+              setNewPassword('');
               Alert.alert('Contraseña cambiada con éxito');
             }
 
@@ -115,6 +117,11 @@ const RestaurantProfile = () => {
 
   const handleEditInfo = async () => {
     setLoading(true);
+    if (phone.length !== 10) {
+      setLoading(false);
+      Alert.alert('Error', 'El teléfono no está completo');
+      return;
+    }
     try {
       const changed = await editInfoProveedor(address, phone, id);
       if (changed.status === 'success') {
@@ -170,6 +177,11 @@ const RestaurantProfile = () => {
   const handleCodeChange = (text) => {
     const formattedText = text.toUpperCase().slice(0, 6);
     setComedorCode(formattedText);
+  };
+
+  const handlePhoneChange = (text) => {
+    const numericText = text.replace(/[^0-9]/g, '');
+    setPhone(numericText);
   };
 
   if (loading) {
@@ -261,7 +273,7 @@ const RestaurantProfile = () => {
           <Switch
             style={styles.switch}
             trackColor={{ false: '#767577', true: '#FFD659' }}
-            thumbColor={isEnabled ? '#ffc107' : '#f4f3f4'}
+            thumbColor={isEnabled ? '#FFA500' : '#f4f3f4'}
             ios_backgroundColor="#3e3e3e"
             onValueChange={toggleSwitch}
             value={isEnabled}
@@ -356,7 +368,9 @@ const RestaurantProfile = () => {
               style={styles.input}
               placeholder="Teléfono"
               value={phone}
-              onChangeText={setPhone}
+              onChangeText={handlePhoneChange}
+              maxLength={10}
+              keyboardType="numeric"
             />
             <TextInput
               style={styles.input}
@@ -428,8 +442,6 @@ const RestaurantProfile = () => {
     </ScrollView>
   );
 }
-
-export default RestaurantProfile;
 
 const styles = StyleSheet.create({
   containerActivityIndicator: {
@@ -555,7 +567,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   actionButton: {
-    backgroundColor: '#ffc107',
+    backgroundColor: '#FFA500',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
@@ -638,3 +650,5 @@ const styles = StyleSheet.create({
     transform: [{ scaleX: 1.5 }, { scaleY: 1.5}], // Increase size
   },
 });
+
+export default RestaurantProfile;

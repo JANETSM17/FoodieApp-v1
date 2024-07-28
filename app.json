@@ -18,10 +18,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logos/AppLogo.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.foodiedbjs.Foodie"
     },
     "web": {
       "favicon": "./assets/images/logos/FoodieLogo.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f78d19eb-1597-475c-94c7-f462de1849a9"
+      }
+    },
+    "owner": "foodiedbjs"
   }
 }

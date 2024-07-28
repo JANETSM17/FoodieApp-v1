@@ -22,11 +22,55 @@ const Register = ({ route, navigation }) => {
 
 
   const handleInputChange = (name, value) => {
+    if (name === 'telefono') {
+      // Filtra cualquier caracter que no sea numérico
+      value = value.replace(/[^0-9]/g, '');
+    }
+    if (name === 'rfc') {
+      value = value.toUpperCase();
+    }
     setFormData({ ...formData, [name]: value });
   };
 
   const handleRegister = async () => {
     setLoading(true);
+
+    // Validar campos vacíos
+    const requiredFieldsUsuario = ['nombre', 'apellido', 'correo', 'contraseña', 'confirm_password', 'telefono'];
+    const requiredFieldsProveedor = ['nombre_empresa', 'correo_corporativo', 'contraseña', 'confirm_password', 'telefono', 'rfc', 'direccion_comercial', 'regimen_fiscal'];
+    
+    const emptyFields = userType === 'Usuario'
+      ? requiredFieldsUsuario.filter(field => !formData[field])
+      : requiredFieldsProveedor.filter(field => !formData[field]);
+
+    if (emptyFields.length > 0) {
+      setLoading(false);
+      Alert.alert('Error', 'Por favor, completa todos los campos');
+      return;
+    }
+
+    // Validar el correo electrónico
+    const emailField = userType === 'Usuario' ? 'correo' : 'correo_corporativo';
+    if (!formData[emailField].includes('@')) {
+      setLoading(false);
+      Alert.alert('Error', 'Por favor, ingresa un correo electrónico válido');
+      return;
+    }
+
+    // Validar el número de teléfono
+    if (formData.telefono.length !== 10) {
+      setLoading(false);
+      Alert.alert('Error', 'El teléfono no está completo');
+      return;
+    }
+
+    // Validar el RFC
+    if (userType !== 'Usuario' && (formData.rfc.length < 12)) {
+      setLoading(false);
+      Alert.alert('Error', 'El RFC no está completo');
+      return;
+    }
+
     const payload = userType === 'Usuario' ? {
       nombre: formData.nombre,
       apellido: formData.apellido,
@@ -124,6 +168,8 @@ const Register = ({ route, navigation }) => {
             style={styles.input}
             placeholder="Número de teléfono"
             onChangeText={(text) => handleInputChange('telefono', text)}
+            maxLength={10}
+            keyboardType="numeric"
           />
         </>
       ) : (
@@ -137,11 +183,14 @@ const Register = ({ route, navigation }) => {
             style={styles.input}
             placeholder="Número telefónico"
             onChangeText={(text) => handleInputChange('telefono', text)}
+            maxLength={10}
+            keyboardType="numeric"
           />
           <TextInput
             style={styles.input}
             placeholder="RFC"
             onChangeText={(text) => handleInputChange('rfc', text)}
+            maxLength={13}
           />
           <TextInput
             style={styles.input}
@@ -170,14 +219,6 @@ const Register = ({ route, navigation }) => {
             secureTextEntry
             onChangeText={(text) => handleInputChange('confirm_password', text)}
           />
-          {/* <View style={styles.checkboxContainer}>
-            <CheckBox />
-            <Text style={styles.checkboxLabel}>Acepto y he leído los términos y condiciones</Text>
-          </View>
-          <View style={styles.checkboxContainer}>
-            <CheckBox />
-            <Text style={styles.checkboxLabel}>Acepto y he leído la Política de privacidad</Text>
-          </View> */}
         </>
       )}
       <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>

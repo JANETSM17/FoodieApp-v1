@@ -57,6 +57,8 @@ const UserProfile = () => {
         try {
             const changed = await changePassword(oldPassword, newPassword, userType, id);
             if (changed.status === 'success') {
+              setOldPassword('');
+              setNewPassword('');
               Alert.alert('Contraseña cambiada con éxito');
             }
 
@@ -91,6 +93,11 @@ const UserProfile = () => {
 
   const handleEditInfo = async () => {
     setLoading(true);
+    if (phone.length !== 10) {
+      setLoading(false);
+      Alert.alert('Error', 'El teléfono no está completo');
+      return;
+    }
     try {
       const changed = await editInfoClient(nombre, phone, id);
       if (changed.status === 'success') {
@@ -103,7 +110,11 @@ const UserProfile = () => {
       setLoading(false);
     }
   };
-  
+
+  const handlePhoneChange = (text) => {
+    const numericText = text.replace(/[^0-9]/g, '');
+    setPhone(numericText);
+  };
 
   if (loading) {
     return (
@@ -180,7 +191,9 @@ const UserProfile = () => {
               style={styles.input}
               placeholder="Teléfono"
               value={phone}
-              onChangeText={setPhone}
+              onChangeText={handlePhoneChange}
+              maxLength={10}
+              keyboardType="numeric"
             />
             <TouchableOpacity style={styles.modalButton} onPress={handleEditInfo}>
               <Text style={styles.modalButtonText}>Guardar</Text>
@@ -350,13 +363,15 @@ const styles = StyleSheet.create({
     color: 'orange',
   },
   editButton: {
-    backgroundColor: 'orange',
-    padding: 15,
-    borderRadius: 10,
-    marginHorizontal: 15,
-    marginBottom: 15,
+    backgroundColor: '#FFA500',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
     alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: 5,
+    width: '60%',
+    alignSelf: 'center',
+    marginBottom: 15,
   },
   editButtonText: {
     color: 'white',
@@ -364,13 +379,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   actionButton: {
-    backgroundColor: 'orange',
-    padding: 15,
-    borderRadius: 10,
-    marginHorizontal: 15,
-    marginBottom: 15,
+    backgroundColor: '#FFA500',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
     alignItems: 'center',
-    justifyContent: 'center',
+    marginVertical: 5,
+    width: '60%',
+    alignSelf: 'center',
   },
   actionButtonText: {
     color: 'white',
