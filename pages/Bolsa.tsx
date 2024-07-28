@@ -126,7 +126,7 @@ const handleLoad = async () => {
       <ScrollView style={styles.scrollContainer} contentContainerStyle={{ paddingBottom: 100 }}>
         {items.map((item) => (
           <View key={item._id} style={styles.itemContainer}>
-            <Image source={require('../assets/images/comida/burrito.png')} style={styles.itemImage} />
+            <Image source={{ uri: item.imagen }} style={styles.itemImage} />
             <View style={styles.itemDetails}>
               <Text style={styles.itemName}>{item.nombre}</Text>
               <Text style={styles.itemPrice}>${item.precio}</Text>

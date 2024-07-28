@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Switch, Mo
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
 import RNPickerSelect from 'react-native-picker-select';
-import { getProductosProveedor, getUserInfo, updateEstatusProducto } from '../services/demoService';
+import { deleteProductoMenu, getProductosProveedor, getUserInfo, updateEstatusProducto, updateProducto } from '../services/demoService';
 
 const menuItems = [
   {
@@ -80,27 +80,53 @@ if (loading) {
     }
   };
 
-  const handleDeletePress = (id) => {
+  const handleDeletePress = async (id) => {
     setItemToDelete(id);
     setIsDeleteModalVisible(true);
   };
 
-  const handleDeleteConfirm = () => {
-    setIsDeleteModalVisible(false);
+  const handleDeleteConfirm = async () => {
+    setLoading(true)
+    const id = itemToDelete
+    try {
+      const deleted = await deleteProductoMenu(id);
+      if(deleted.status === 'success'){
+        Alert.alert("Producto eliminado")
+      }
+    } catch (error) {
+      console.error('Error deleting:', error);
+      Alert.alert('Trono', error.message || 'Error desconocido');
+    } finally {
+      setIsDeleteModalVisible(false);
+      handleLoad()
+    }
   };
 
   const handleEditPress = (item) => {
-    setItemToEdit(item);
-    setEditedName(item.name);
-    setEditedPrice(item.price.toString());
-    setEditedDescription(item.description);
-    setEditedCategory(item.category);
-    setEditedImage(item.image);
+    console.log(item)
+    setItemToEdit(item.id);
+    setEditedName(item.nombre);
+    setEditedPrice(item.precio.toString());
+    setEditedDescription(item.descripcion);
+    setEditedCategory(item.categoria);
     setIsEditModalVisible(true);
   };
 
-  const handleEditSave = () => {
-    setIsEditModalVisible(false);
+  const handleEditSave = async() => {
+    setLoading(true)
+    try {
+      const modified = await updateProducto(itemToEdit, editedName, editedDescription, editedPrice, editedCategory)
+      //console.log('Esto me llega: ', itemToEdit, editedName, editedDescription, editedPrice, editedCategory)
+       if(modified.status === 'success'){
+         Alert.alert("Producto actualizado")
+       }
+    } catch (error) {
+      console.error('Error updating:', error);
+      Alert.alert('Trono', error.message || 'Error desconocido');
+    } finally {
+      setIsEditModalVisible(false);
+      handleLoad()
+    }
   };
 
   const filteredItems = items.filter((item) => item.categoria === selectedCategory.toLowerCase());
@@ -130,7 +156,7 @@ if (loading) {
       <ScrollView style={styles.container}>
         {filteredItems.map((item) => (
           <View key={item.id} style={styles.itemContainer}>
-            <Image source={require('../assets/images/fotosCliente/FoxClient.jpeg')} style={styles.itemImage} />
+            <Image source={{ uri: item.imagen }} style={styles.itemImage} />
             <View style={styles.itemDetails}>
               <Text style={styles.itemName}>{item.nombre}</Text>
               <Text style={styles.itemDescription}>{item.descripcion}</Text>
@@ -214,9 +240,6 @@ if (loading) {
               style={pickerSelectStyles}
               value={editedCategory.toLowerCase()}
             />
-            <TouchableOpacity style={styles.uploadButton}>
-              <Text style={styles.uploadButtonText}>Subir imagen</Text>
-            </TouchableOpacity>
             <TouchableOpacity style={styles.modalButton} onPress={handleEditSave}>
               <Text style={styles.modalButtonText}>Guardar</Text>
             </TouchableOpacity>
@@ -334,6 +357,7 @@ const styles = StyleSheet.create({
   },
   editButton: {
     marginBottom: 5,
+    marginRight: 15,
   },
   deleteButton: {
     marginBottom: 5,

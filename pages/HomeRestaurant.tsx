@@ -72,7 +72,7 @@ const handleLoad = async () => {
     return filteredOrders.map(order => (
       <TouchableOpacity key={order.id} style={styles.orderContainer} onPress={() => handleOrderPress(order)}>
         <View style={styles.orderHeader}>
-          <Image source={require('../assets/images/fotosCliente/FoxClient.jpeg')} style={styles.avatar} />
+          <Image source={{ uri: order.image }} style={styles.avatar} />
           <View>
             <Text style={styles.customerName}>{order.customerName}</Text>
             <Text style={styles.orderDetails}>Número de pedido: <Text style={styles.boldText}>{order.orderNumber}</Text></Text>

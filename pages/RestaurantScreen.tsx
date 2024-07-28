@@ -101,7 +101,7 @@ const RestaurantScreen = () => {
             <Ionicons name="arrow-back" size={24} color="white" />
           </TouchableOpacity>
         </View>
-        <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.restaurantImage} />
+        <Image source={{ uri: comedor?.imagen }} style={styles.restaurantImage} />
         <Text style={styles.restaurantName}>{comedor?.nombre}</Text>
       </View>
       <View style={styles.contentContainer}>
@@ -129,7 +129,7 @@ const RestaurantScreen = () => {
 
         {menuItems[selectedMenu].map((item, index) => (
           <View key={index} style={styles.menuItem}>
-            <Image source={item.imagen} style={styles.menuItemImage} /> 
+            <Image source={{ uri: item.imagen }} style={styles.menuItemImage} /> 
             <View style={styles.menuItemInfo}>
               <Text style={styles.menuItemText}>{item.nombre}</Text>
               <Text style={styles.menuItemDescription}>{item.descripcion}</Text>

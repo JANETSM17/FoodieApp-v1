@@ -128,7 +128,7 @@ function HomePage() {
                             <TouchableOpacity onPress={() => handleDeleteComedor(comedor._id)}>
                                 <Ionicons name="close" size={30} color="black" />
                             </TouchableOpacity>
-                            <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.comedorImage} />
+                            <Image source={{ uri: comedor.imagen }} style={styles.comedorImage} />
                             <View style={styles.comedorInfo}>
                                 <Text style={styles.comedorTitle}>{comedor.nombre}</Text>
                                 <Text style={styles.comedorRating}>

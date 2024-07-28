@@ -13,6 +13,7 @@ const RestaurantProfile = () => {
   const [isEditPrepTimeModalVisible, setEditPrepTimeModalVisible] = useState(false);
   const [isEditCodeModalVisible, setEditCodeModalVisible] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
+  const [image, setImage] = useState('');
   const [name, setName] = useState('Wendys');
   const [code, setComedorCode] = useState('AS98DF2');
   const [email, setEmail] = useState('wendys@foodie.com');
@@ -63,6 +64,7 @@ const RestaurantProfile = () => {
               setComedorCode(clientInfo.clave)
               setID(clientInfo._id)
               setIsEnabled(clientInfo.active)
+              setImage(clientInfo.imagen)
               console.log('ESTA isEnabled: ', isEnabled)
               console.log('ESTA clientInfo.active: ', clientInfo.active)
           }
@@ -189,7 +191,7 @@ const RestaurantProfile = () => {
       </View>
 
       <View style={styles.profileContainer}>
-        <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.restaurantImage} />
+        <Image source={{ uri: image }} style={styles.restaurantImage} />
       </View>
       <Text style={styles.restaurantName}>{name}</Text>
       <TouchableOpacity onPress={() => setEditCodeModalVisible(true)}>

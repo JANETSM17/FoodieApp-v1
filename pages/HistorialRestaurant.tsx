@@ -63,7 +63,7 @@ const HistorialRestaurant = () => {
         {ordersHistory.map((order) => (
           <TouchableOpacity key={order._id} style={styles.orderContainer} onPress={() => handleOrderPress(order)}>
             <View style={styles.orderHeader}>
-              <Image source={require('../assets/images/fotosCliente/FoxClient.jpeg')} style={styles.avatar} />
+              <Image source={{ uri: order.ruta }} style={styles.avatar} />
               <View>
                 <Text style={styles.customerName}>{order.nombre}</Text>
                 <Text style={styles.orderDetails}>Número de pedido: <Text style={styles.boldText}>{order.numerodepedido}</Text></Text>

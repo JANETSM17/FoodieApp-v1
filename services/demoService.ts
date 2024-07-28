@@ -995,4 +995,59 @@ async function updateEstatusProducto(newState, id) {
   }
 }
 
-export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword, deleteAccount, getProductos, deleteProducto, modifyQuantityProducto,editInfoClient, confirmFoodieBox, confirmPedido, confirmEspera, sendPedido, getHistorialPedidos, editInfoProveedor, editPrepTime, editClave, getPedidosEnCurso, updateEstatusComedor, getPedidosProveedor, acceptPedido, denyPedido, changeOrderReady, changeOrderDelivered, getProductosProveedor, updateEstatusProducto};
+async function deleteProductoMenu(id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}eliminarProducto/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error eliminando cuenta");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    return error;
+  }
+}
+
+async function updateProducto(id, nombre, descripcion, precio, categoria) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}updateProducto/${id}/${nombre}/${encodeURI(descripcion)}/${precio}/${categoria}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+    });
+
+    const responseData = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(responseData.message || "Error changing status");
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error("Error modifying product:", error);
+    throw error; // Re-throw the error to be caught in handleEditInfo
+  }
+}
+
+export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword, deleteAccount, getProductos, deleteProducto, modifyQuantityProducto,editInfoClient, confirmFoodieBox, confirmPedido, confirmEspera, sendPedido, getHistorialPedidos, editInfoProveedor, editPrepTime, editClave, getPedidosEnCurso, updateEstatusComedor, getPedidosProveedor, acceptPedido, denyPedido, changeOrderReady, changeOrderDelivered, getProductosProveedor, updateEstatusProducto, deleteProductoMenu, updateProducto};

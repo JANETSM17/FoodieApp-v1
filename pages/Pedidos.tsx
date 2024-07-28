@@ -97,7 +97,7 @@ const Pedidos = ({ navigation }) => {
         </View>
         {pendingOrders.map((order) => (
           <TouchableOpacity key={order.id} onPress={() => handlePendingOrderPress(order)} style={styles.orderCard}>
-            <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.orderImage} />
+            <Image source={{ uri: order.ruta }} style={styles.orderImage} />
             <View>
               <Text style={styles.orderRestaurant}>{order.nombre}</Text>
               <Text style={styles.orderPrice}>Total: ${order.total}</Text>
@@ -114,7 +114,7 @@ const Pedidos = ({ navigation }) => {
         <View style={styles.divider} />
         {pastOrders.map((order) => (
           <TouchableOpacity key={order._id} onPress={() => handleHistorialOrderPress(order)} style={styles.orderCard}>
-            <Image source={require('../assets/images/restaurantes/utch_logo.png')} style={styles.orderImage} />
+            <Image source={{ uri: order.ruta }} style={styles.orderImage} />
             <View>
               <Text style={styles.orderRestaurant}>{order.proveedor}</Text>
               <Text style={styles.orderPrice}>Total: ${order.total}</Text>

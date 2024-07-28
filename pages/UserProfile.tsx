@@ -124,7 +124,7 @@ const UserProfile = () => {
       </View>
 
       <View style={styles.profileContainer}>
-        <Image source={require('../assets/images/fotosCliente/FoxClient.jpeg')} style={styles.image} />
+        <Image source={{ uri: image }} style={styles.image} />
         <Text style={styles.userFullName}>{nombre}</Text>
       </View>
 
