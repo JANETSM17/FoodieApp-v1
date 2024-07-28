@@ -15,7 +15,10 @@ const Pedidos = ({ navigation }) => {
   const [totalSpent, setTotalSpent] = useState('$368');
 
   useEffect(() => {
+    const loadInterval = setInterval(handleLoad, 300000); // 300000 ms = 5 minutos
     handleLoad();
+
+    return () => clearInterval(loadInterval);
   }, []);
 
   const handleLoad = async () => {

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Switch, Modal, TextInput, Alert} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Switch, Modal, TextInput, Alert, ActivityIndicator} from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useNavigation } from '@react-navigation/native';
+import RNPickerSelect from 'react-native-picker-select';
+import { getProductosProveedor, getUserInfo, updateEstatusProducto } from '../services/demoService';
 
 const menuItems = [
   {
@@ -12,95 +14,14 @@ const menuItems = [
     description: 'Asado rojo, ...',
     category: 'Comida',
     isActive: true,
-  },
-  {
-    id: '2',
-    name: 'Pizza Italiana',
-    price: 15.00,
-    image: require('../assets/images/comida/pizza.png'),
-    description: 'Pepperoni, queso mozarela...',
-    category: 'Comida',
-    isActive: true,
-  },
-  {
-    id: '3',
-    name: 'Coca-Cola',
-    price: 2.00,
-    image: require('../assets/images/comida/pizza.png'),
-    description: 'Bebida refrescante...',
-    category: 'Bebidas',
-    isActive: true,
-  },
-  {
-    id: '4',
-    name: 'Jugo de Naranja',
-    price: 3.00,
-    image: require('../assets/images/comida/burrito.png'),
-    description: 'Jugo natural...',
-    category: 'Bebidas',
-    isActive: true,
-  },
-  {
-    id: '5',
-    name: 'Papitas',
-    price: 1.50,
-    image: require('../assets/images/comida/burrito.png'),
-    description: 'Papas fritas...',
-    category: 'Frituras',
-    isActive: true,
-  },
-  {
-    id: '6',
-    name: 'Chicharrones',
-    price: 2.00,
-    image: require('../assets/images/comida/pizza.png'),
-    description: 'Chicharrones crujientes...',
-    category: 'Frituras',
-    isActive: true,
-  },
-  {
-    id: '7',
-    name: 'Paleta de Chocolate',
-    price: 1.00,
-    image: require('../assets/images/comida/pizza.png'),
-    description: 'Paleta de chocolate...',
-    category: 'Dulces',
-    isActive: true,
-  },
-  {
-    id: '8',
-    name: 'Caramelo',
-    price: 0.50,
-    image: require('../assets/images/comida/burrito.png'),
-    description: 'Caramelo dulce...',
-    category: 'Dulces',
-    isActive: true,
-  },
-  {
-    id: '9',
-    name: 'Torta de Jamón',
-    price: 5.00,
-    image: require('../assets/images/comida/pizza.png'),
-    description: 'Torta con jamón...',
-    category: 'Otros',
-    isActive: true,
-  },
-  {
-    id: '10',
-    name: 'Ensalada',
-    price: 7.00,
-    image: require('../assets/images/comida/burrito.png'),
-    description: 'Ensalada fresca...',
-    category: 'Otros',
-    isActive: true,
-  },
-];
+  },];
 
 const categories = ['Comida', 'Bebidas', 'Frituras', 'Dulces', 'Otros'];
 
 const MenuRestaurant = () => {
   const navigation = useNavigation();
-  const [items, setItems] = useState(menuItems);
+  const [loading, setLoading] = useState(true);
+  const [items, setItems] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('Comida');
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -112,12 +33,51 @@ const MenuRestaurant = () => {
   const [editedCategory, setEditedCategory] = useState(categories[0]);
   const [editedImage, setEditedImage] = useState(null);
 
-  const handleToggleChange = (id) => {
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, isActive: !item.isActive } : item
-      )
-    );
+  useEffect(() => {
+    handleLoad();
+  }, []);
+
+const handleLoad = async () => {
+    setLoading(true);
+    try {
+      const clientInfo = await getUserInfo();
+
+      if(clientInfo){
+        const productos = await getProductosProveedor(clientInfo._id)
+        if(productos){
+          setItems(productos);
+        }
+      }
+
+        
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    } finally {
+        setLoading(false);
+    }
+};
+
+if (loading) {
+  return (
+      <View style={styles.containerActivityIndicator}>
+          <ActivityIndicator size="large" color="#F5B000" />
+      </View>
+  );
+}
+
+  const handleToggleChange = async (id, currentState) => {
+    setLoading(true)
+    console.log(currentState)
+    const newState = !currentState
+    console.log('NewState:', newState)
+    try {
+      const changed = await updateEstatusProducto(newState, id);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      Alert.alert('Trono', error.message || 'Error desconocido');
+    } finally {
+      handleLoad()
+    }
   };
 
   const handleDeletePress = (id) => {
@@ -126,7 +86,6 @@ const MenuRestaurant = () => {
   };
 
   const handleDeleteConfirm = () => {
-    setItems((prevItems) => prevItems.filter((item) => item.id !== itemToDelete));
     setIsDeleteModalVisible(false);
   };
 
@@ -141,17 +100,10 @@ const MenuRestaurant = () => {
   };
 
   const handleEditSave = () => {
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === itemToEdit.id
-          ? { ...item, name: editedName, price: parseFloat(editedPrice), description: editedDescription, category: editedCategory, image: editedImage }
-          : item
-      )
-    );
     setIsEditModalVisible(false);
   };
 
-  const filteredItems = items.filter((item) => item.category === selectedCategory);
+  const filteredItems = items.filter((item) => item.categoria === selectedCategory.toLowerCase());
 
   return (
     <View style={styles.mainContainer}>
@@ -163,14 +115,14 @@ const MenuRestaurant = () => {
         <View style={{ width: 40 }} />
       </View>
       <View style={styles.filterContainer}>
-        {categories.map((category) => (
+        {categories.map((categoria) => (
           <TouchableOpacity
-            key={category}
-            style={[styles.filterButton, selectedCategory === category && styles.selectedFilterButton]}
-            onPress={() => setSelectedCategory(category)}
+            key={categoria}
+            style={[styles.filterButton, selectedCategory === categoria && styles.selectedFilterButton]}
+            onPress={() => setSelectedCategory(categoria)}
           >
-            <Text style={[styles.filterButtonText, selectedCategory === category && styles.selectedFilterButtonText]}>
-              {category}
+            <Text style={[styles.filterButtonText, selectedCategory === categoria && styles.selectedFilterButtonText]}>
+              {categoria}
             </Text>
           </TouchableOpacity>
         ))}
@@ -178,18 +130,18 @@ const MenuRestaurant = () => {
       <ScrollView style={styles.container}>
         {filteredItems.map((item) => (
           <View key={item.id} style={styles.itemContainer}>
-            <Image source={item.image} style={styles.itemImage} />
+            <Image source={require('../assets/images/fotosCliente/FoxClient.jpeg')} style={styles.itemImage} />
             <View style={styles.itemDetails}>
-              <Text style={styles.itemName}>{item.name}</Text>
-              <Text style={styles.itemDescription}>{item.description}</Text>
-              <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
+              <Text style={styles.itemName}>{item.nombre}</Text>
+              <Text style={styles.itemDescription}>{item.descripcion}</Text>
+              <Text style={styles.itemPrice}>${item.precio}</Text>
             </View>
             <View style={styles.actionsContainer}>
               <TouchableOpacity
                 style={styles.editButton}
                 onPress={() => handleEditPress(item)}
               >
-                <Ionicons name="pencil-outline" size={24} color="blue" />
+                <Ionicons name="pencil-outline" size={24} color="orange" />
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.deleteButton}
@@ -198,10 +150,10 @@ const MenuRestaurant = () => {
                 <Ionicons name="trash-outline" size={24} color="red" />
               </TouchableOpacity>
               <Switch
-                value={item.isActive}
-                onValueChange={() => handleToggleChange(item.id)}
+                value={item.active}
+                onValueChange={() => handleToggleChange(item.id, item.active)}
                 trackColor={{ true: 'orange', false: 'grey' }}
-                thumbColor={item.isActive ? 'orange' : 'white'}
+                thumbColor={item.active ? 'orange' : 'white'}
               />
             </View>
           </View>
@@ -253,7 +205,15 @@ const MenuRestaurant = () => {
               value={editedDescription}
               onChangeText={setEditedDescription}
             />
-            
+            <RNPickerSelect
+              onValueChange={(value) => setEditedCategory(value)}
+              items={categories.map((category) => ({
+                label: category,
+                value: category.toLowerCase(),
+              }))}
+              style={pickerSelectStyles}
+              value={editedCategory.toLowerCase()}
+            />
             <TouchableOpacity style={styles.uploadButton}>
               <Text style={styles.uploadButtonText}>Subir imagen</Text>
             </TouchableOpacity>
@@ -271,6 +231,13 @@ const MenuRestaurant = () => {
 };
 
 const styles = StyleSheet.create({
+  containerActivityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F0F0F0',
+    padding: 20,
+},
   mainContainer: {
     flex: 1,
     backgroundColor: 'white',
@@ -418,10 +385,6 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     marginBottom: 10,
   },
-  picker: {
-    width: '100%',
-    marginBottom: 10,
-  },
   uploadButton: {
     backgroundColor: 'orange',
     padding: 10,
@@ -434,6 +397,29 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+  inputAndroid: {
+    fontSize: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 10,
+    borderColor: 'gray',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
   },
 });
 

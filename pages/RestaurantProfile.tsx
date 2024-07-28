@@ -37,12 +37,12 @@ const RestaurantProfile = () => {
     console.log('NewState:', newState)
     try {
       const changed = await updateEstatusComedor(newState, id);
-  } catch (error) {
+    } catch (error) {
       console.error('Error fetching data:', error);
       Alert.alert('Trono', error.message || 'Error desconocido');
-  } finally {
+    } finally {
       handleLoad()
-  }
+    }
   };
 
   useEffect(() => {

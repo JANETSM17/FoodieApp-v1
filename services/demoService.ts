@@ -938,4 +938,61 @@ async function changeOrderDelivered(id) {
   }
 }
 
-export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword, deleteAccount, getProductos, deleteProducto, modifyQuantityProducto,editInfoClient, confirmFoodieBox, confirmPedido, confirmEspera, sendPedido, getHistorialPedidos, editInfoProveedor, editPrepTime, editClave, getPedidosEnCurso, updateEstatusComedor, getPedidosProveedor, acceptPedido, denyPedido, changeOrderReady, changeOrderDelivered};
+async function getProductosProveedor(id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}/productosProveedor/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      }, 
+    });
+
+    if (!response.ok) {
+      throw new Error("Error fetching productos del proveedor");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching productos del proveedor:", error);
+    return [];
+  }
+}
+
+async function updateEstatusProducto(newState, id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}updateSwitchStateProducto/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ newState })
+    });
+
+    const responseData = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(responseData.message || "Error changing status");
+    }
+
+    return responseData;
+  } catch (error) {
+    console.error("Error changing status:", error);
+    throw error; // Re-throw the error to be caught in handleEditInfo
+  }
+}
+
+export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword, deleteAccount, getProductos, deleteProducto, modifyQuantityProducto,editInfoClient, confirmFoodieBox, confirmPedido, confirmEspera, sendPedido, getHistorialPedidos, editInfoProveedor, editPrepTime, editClave, getPedidosEnCurso, updateEstatusComedor, getPedidosProveedor, acceptPedido, denyPedido, changeOrderReady, changeOrderDelivered, getProductosProveedor, updateEstatusProducto};
