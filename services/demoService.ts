@@ -803,4 +803,139 @@ async function getPedidosEnCurso(email, id) {
   }
 }
 
-export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword, deleteAccount, getProductos, deleteProducto, modifyQuantityProducto,editInfoClient, confirmFoodieBox, confirmPedido, confirmEspera, sendPedido, getHistorialPedidos, editInfoProveedor, editPrepTime, editClave, getPedidosEnCurso, updateEstatusComedor};
+async function getPedidosProveedor(email) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}/pedidosProveedor/${email}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      }, 
+    });
+
+    if (!response.ok) {
+      throw new Error("Error fetching pedidos del proveedor");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching pedidos del proveedor:", error);
+    return [];
+  }
+}
+
+async function acceptPedido(id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}/aceptarPedido/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      }, 
+    });
+
+    if (!response.ok) {
+      throw new Error("Error fetching pedidos del proveedor");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching pedidos del proveedor:", error);
+    return [];
+  }
+}
+
+async function denyPedido(id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}/rechazarPedido/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      }, 
+    });
+
+    if (!response.ok) {
+      throw new Error("Error fetching pedidos del proveedor");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching pedidos del proveedor:", error);
+    return [];
+  }
+}
+
+async function changeOrderReady(id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}/pedidoListo/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      }, 
+    });
+
+    if (!response.ok) {
+      throw new Error("Error fetching pedidos del proveedor");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching pedidos del proveedor:", error);
+    return [];
+  }
+}
+
+async function changeOrderDelivered(id) {
+  try {
+    const authDataSerialize = await AsyncStorage.getItem('@authData');
+    if (!authDataSerialize) {
+      throw new Error("Not auth data storage");
+    }
+    const { token } = JSON.parse(authDataSerialize);
+
+    const response = await fetch(`${authHost}/pedidoEntregado/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      }, 
+    });
+
+    if (!response.ok) {
+      throw new Error("Error fetching pedidos del proveedor");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching pedidos del proveedor:", error);
+    return [];
+  }
+}
+
+export { getUserInfo, getComedores, addComedor, deleteComedor, getComedor, getComida, getBebidas, getFrituras, getDulces, getOtros, getCarritoID, confirmCarrito, addToCarrito, changePassword, deleteAccount, getProductos, deleteProducto, modifyQuantityProducto,editInfoClient, confirmFoodieBox, confirmPedido, confirmEspera, sendPedido, getHistorialPedidos, editInfoProveedor, editPrepTime, editClave, getPedidosEnCurso, updateEstatusComedor, getPedidosProveedor, acceptPedido, denyPedido, changeOrderReady, changeOrderDelivered};

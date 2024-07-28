@@ -1,163 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Modal, ActivityIndicator, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Modal, ActivityIndicator, TextInput, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import useAuth from "../hooks/useAuth";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getUserInfo } from '../services/demoService';
-
-const ordersToAccept = [
-  {
-    id: 7,
-    customerName: 'Mike Tyson',
-    orderNumber: 27,
-    phoneNumber: '(614)-216-78-27',
-    items: [
-      '2x Pizza Piña',
-      '1x Hamburguesa',
-      '4x Coca-Cola',
-    ],
-    specifications: 'Sin especificaciones',
-    total: 250,
-    pickupTime: '11:59 am',
-    deliveryType: 'Foodie-Box',
-    status: 'Esperando confirmacion'
-  },
-  {
-    id: 8,
-    customerName: 'Mike Tyson',
-    orderNumber: 28,
-    phoneNumber: '(614)-216-78-27',
-    items: [
-      '2x Pizza Piña',
-      '1x Hamburguesa',
-      '4x Coca-Cola',
-    ],
-    specifications: 'Sin especificaciones',
-    total: 250,
-    pickupTime: '11:59 am',
-    deliveryType: 'Pick-Up',
-    status: 'Esperando confirmacion'
-  },
-  {
-    id: 9,
-    customerName: 'Mike Tyson',
-    orderNumber: 29,
-    phoneNumber: '(614)-216-78-27',
-    items: [
-      '2x Pizza Piña',
-      '1x Hamburguesa',
-      '4x Coca-Cola',
-    ],
-    specifications: 'Sin especificaciones',
-    total: 250,
-    pickupTime: '11:59 am',
-    deliveryType: 'Foodie-Box',
-    status: 'Esperando confirmacion'
-  },
-];
-
-const ordersInProgress = [
-  {
-    id: 1,
-    customerName: 'Mike Tyson',
-    orderNumber: 21,
-    phoneNumber: '(614)-216-78-27',
-    items: [
-      '2x Pizza Piña',
-      '1x Hamburguesa',
-      '4x Coca-Cola',
-    ],
-    specifications: 'Sin especificaciones',
-    total: 250,
-    pickupTime: '11:59 am',
-    deliveryType: 'Foodie-Box',
-    status: 'Preparando'
-  },
-  {
-    id: 2,
-    customerName: 'Mike Tyson',
-    orderNumber: 22,
-    phoneNumber: '(614)-216-78-27',
-    items: [
-      '2x Pizza Piña',
-      '1x Hamburguesa',
-      '4x Coca-Cola',
-    ],
-    specifications: 'Sin especificaciones',
-    total: 250,
-    pickupTime: '11:59 am',
-    deliveryType: 'Pick-Up',
-    status: 'Preparando'
-  },
-  {
-    id: 3,
-    customerName: 'Mike Tyson',
-    orderNumber: 23,
-    phoneNumber: '(614)-216-78-27',
-    items: [
-      '2x Pizza Piña',
-      '1x Hamburguesa',
-      '4x Coca-Cola',
-    ],
-    specifications: 'Sin especificaciones',
-    total: 250,
-    pickupTime: '11:59 am',
-    deliveryType: 'Foodie-Box',
-    status: 'Preparando'
-  },
-];
-
-const ordersReady = [
-  {
-    id: 4,
-    customerName: 'Mike Tyson',
-    orderNumber: 24,
-    phoneNumber: '(614)-216-78-27',
-    items: [
-      '2x Pizza Piña',
-      '1x Hamburguesa',
-      '4x Coca-Cola',
-    ],
-    specifications: 'Sin especificaciones',
-    total: 250,
-    pickupTime: '11:59 am',
-    status: 'Listo para recoger',
-    deliveryType: 'Foodie-Box'
-  },
-  {
-    id: 5,
-    customerName: 'Mike Tyson',
-    orderNumber: 25,
-    phoneNumber: '(614)-216-78-27',
-    items: [
-      '2x Pizza Piña',
-      '1x Hamburguesa',
-      '4x Coca-Cola',
-    ],
-    specifications: 'Sin especificaciones',
-    total: 250,
-    pickupTime: '11:59 am',
-    status: 'Listo para recoger',
-    deliveryType: 'Pick-Up'
-  },
-  {
-    id: 6,
-    customerName: 'Mike Tyson',
-    orderNumber: 26,
-    phoneNumber: '(614)-216-78-27',
-    items: [
-      '2x Pizza Piña',
-      '1x Hamburguesa',
-      '4x Coca-Cola',
-    ],
-    specifications: 'Sin especificaciones',
-    total: 250,
-    pickupTime: '11:59 am',
-    status: 'Listo para recoger',
-    deliveryType: 'Foodie-Box'
-  },
-];
+import { acceptPedido, changeOrderDelivered, changeOrderReady, denyPedido, getPedidosProveedor, getUserInfo } from '../services/demoService';
 
 const HomeRestaurant = () => {
   const { logout } = useAuth();
@@ -166,12 +13,13 @@ const HomeRestaurant = () => {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [statusModalVisible, setStatusModalVisible] = useState(false);
-  const [orders, setOrders] = useState(ordersInProgress);
   const [isAddProductModalVisible, setAddProductModalVisible] = useState(false);
   const [productName, setProductName] = useState('');
   const [productPrice, setProductPrice] = useState('');
   const [productDescription, setProductDescription] = useState('');
+  const [ordersToAccept, setOrdersToAccept] = useState([]);
+  const [ordersInProgress, setOrdersInProgress] = useState([]);
+  const [ordersReady, setOrdersReady] = useState([]);
 
   const navigation = useNavigation();
 
@@ -188,7 +36,26 @@ const handleLoad = async () => {
             return;
         }
 
-        await AsyncStorage.setItem('clientEmail', clientInfo.correo);
+        if(clientInfo){
+
+          await AsyncStorage.setItem('clientEmail', clientInfo.correo);
+
+          const pedidos = await getPedidosProveedor(clientInfo.correo);
+
+          if(pedidos){
+            // Filtrar pedidos por estado
+            const ordersToAccept = pedidos.filter(order => order.status === 'Esperando confirmacion');
+            const ordersInProgress = pedidos.filter(order => order.status === 'En proceso');
+            const ordersReady = pedidos.filter(order => order.status === 'Listo para recoger');
+
+            if(ordersToAccept && ordersInProgress && ordersReady){
+              // Guardar los pedidos filtrados en los estados correspondientes
+              setOrdersToAccept(ordersToAccept);
+              setOrdersInProgress(ordersInProgress);
+              setOrdersReady(ordersReady);
+            }
+          }
+        }
 
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -214,10 +81,10 @@ const handleLoad = async () => {
         <>
           <Text style={styles.statusReadyText}>Estatus: {order.status}</Text>
           <View style={styles.acceptRejectContainer}>
-            <TouchableOpacity style={styles.acceptButton}>
+            <TouchableOpacity style={styles.acceptButton} onPress={() => handleAceptarOrder(order.id)}>
               <Text style={styles.acceptRejectButtonText}>Aceptar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.rejectButton}>
+            <TouchableOpacity style={styles.rejectButton} onPress={() => handleRechazarOrder(order.id)}>
               <Text style={styles.acceptRejectButtonText}>Rechazar</Text>
             </TouchableOpacity>
           </View>
@@ -226,12 +93,12 @@ const handleLoad = async () => {
       {selectedTab === 'InProgress' && (
         <>
           <Text style={styles.statusReadyText}>Estatus: {order.status}</Text>
-          {order.deliveryType === 'Foodie-Box' ? (
+          {order.deliveryType === 'FoodieBox' ? (
             <View style={styles.foodieBoxContainer}>
               <Text style={styles.foodieBoxText}>Al terminar lleva a la FoodieBox</Text>
             </View>
           ) : (
-            <TouchableOpacity style={styles.readyButton}>
+            <TouchableOpacity style={styles.readyButton} onPress={() => handleChangeReadyOrder(order.id)}>
               <Text style={styles.readyButtonText}>Pasar a listo</Text>
             </TouchableOpacity>
           )}
@@ -240,12 +107,12 @@ const handleLoad = async () => {
       {selectedTab === 'Ready' && (
         <>
           <Text style={styles.statusReadyText}>Estatus: {order.status}</Text>
-          {order.deliveryType === 'Foodie-Box' ? (
+          {order.deliveryType === 'FoodieBox' ? (
             <View style={styles.foodieBoxContainer}>
               <Text style={styles.foodieBoxText}>En FoodieBox</Text>
             </View>
           ) : (
-            <TouchableOpacity style={styles.deliveredButton}>
+            <TouchableOpacity style={styles.deliveredButton} onPress={() => handleChangeDeliveredOrder(order.id)}>
               <Text style={styles.deliveredButtonText}>Entregado</Text>
             </TouchableOpacity>
           )}
@@ -266,22 +133,59 @@ const handleLoad = async () => {
     setSelectedOrder(null);
   };
 
-  const handleCancelOrder = () => {
-    setModalVisible(false);
+  const handleRechazarOrder = async (id) => {
+    setLoading(true);
+    const orderID = id
+    try {
+      const denied = await denyPedido(orderID);
+    } catch (error) {
+        console.error('Error cambiando data:', error);
+        Alert.alert('Error al rechazar pedido');
+    } finally {
+      handleLoad()
+    }
   };
 
-  const handleStatusPress = (order) => {
-    setSelectedOrder(order);
-    setStatusModalVisible(true);
+  const handleAceptarOrder = async (id) => {
+    setLoading(true);
+    const orderID = id
+    try {
+      const accepted = await acceptPedido(orderID);
+    } catch (error) {
+        console.error('Error cambiando data:', error);
+        Alert.alert('Error al aceptar pedido');
+    } finally {
+      handleLoad()
+    }
   };
 
-  const handleStatusChange = (status) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.id === selectedOrder.id ? { ...order, status: status } : order
-      )
-    );
-    setStatusModalVisible(false);
+  const handleChangeReadyOrder = async (id) => {
+    setLoading(true);
+    const orderID = id
+    try {
+      const ready = await changeOrderReady(orderID)
+
+    } catch (error) {
+        console.error('Error cambiando data:', error);
+        Alert.alert('Error al cambiar a listo');
+    } finally {
+      handleLoad()
+    }
+  };
+
+  const handleChangeDeliveredOrder = async (id) => {
+    setLoading(true);
+    const orderID = id
+    try {
+      
+      const delivered = await changeOrderDelivered(orderID)
+
+    } catch (error) {
+        console.error('Error cambiando data:', error);
+        Alert.alert('Error al cambiar a entregado');
+    } finally {
+      handleLoad()
+    }
   };
 
   if (loading) {
@@ -325,16 +229,16 @@ const handleCloseAddProductModal = () => {
         <TouchableOpacity style={[styles.filterButton, selectedFilter === 'All' && styles.activeFilter]} onPress={() => setSelectedFilter('All')}>
           <Text style={[styles.filterText, selectedFilter === 'All' && styles.activeFilterText]}>Todos</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.filterButton, selectedFilter === 'Foodie-Box' && styles.activeFilter]} onPress={() => setSelectedFilter('Foodie-Box')}>
-          <Text style={[styles.filterText, selectedFilter === 'Foodie-Box' && styles.activeFilterText]}>Foodie-Box</Text>
+        <TouchableOpacity style={[styles.filterButton, selectedFilter === 'FoodieBox' && styles.activeFilter]} onPress={() => setSelectedFilter('FoodieBox')}>
+          <Text style={[styles.filterText, selectedFilter === 'FoodieBox' && styles.activeFilterText]}>FoodieBox</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.filterButton, selectedFilter === 'Pick-Up' && styles.activeFilter]} onPress={() => setSelectedFilter('Pick-Up')}>
-          <Text style={[styles.filterText, selectedFilter === 'Pick-Up' && styles.activeFilterText]}>Pick-Up</Text>
+        <TouchableOpacity style={[styles.filterButton, selectedFilter === 'Mostrador' && styles.activeFilter]} onPress={() => setSelectedFilter('Mostrador')}>
+          <Text style={[styles.filterText, selectedFilter === 'Mostrador' && styles.activeFilterText]}>Mostrador</Text>
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.content}>
         {selectedTab === 'ToAccept' && renderOrders(ordersToAccept)}
-        {selectedTab === 'InProgress' && renderOrders(orders)}
+        {selectedTab === 'InProgress' && renderOrders(ordersInProgress)}
         {selectedTab === 'Ready' && renderOrders(ordersReady)}
       </ScrollView>
       {selectedOrder && (
@@ -346,18 +250,21 @@ const handleCloseAddProductModal = () => {
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Detalles del Pedido</Text>
-              <Text style={styles.modalText}>Especificaciones: {selectedOrder.specifications}</Text>
-              <Text style={styles.modalText}>Tipo de entrega: {selectedOrder.deliveryType}</Text>
+              <Text style={styles.modalTitle}>Pedido #{selectedOrder?.orderNumber}</Text>
+              <Text style={styles.modalText}>Tipo de entrega:</Text>
+              <Text style={styles.modalItemText}>{selectedOrder?.deliveryType}</Text>
               <Text style={styles.modalText}>Productos:</Text>
-              {selectedOrder.items.map((item, index) => (
-                <Text key={index} style={styles.modalItemText}>{item}</Text>
-              ))}
-              <Text style={styles.modalText}>Especificaciones: {selectedOrder.specifications}</Text>
-              <Text style={styles.modalText}>Total: ${selectedOrder.total}</Text>
-              <Text style={styles.modalText}>Hora de Pick-up: {selectedOrder.pickupTime}</Text>
+              <Text style={styles.modalItemText}>{selectedOrder?.items}</Text>
+              <Text style={styles.modalText}>Especificaciones:</Text>
+              <Text style={styles.modalItemText}>{selectedOrder?.specifications}</Text>
+              <Text style={styles.modalText}>Total:</Text>
+              <Text style={styles.modalItemText}>${selectedOrder?.total}</Text>
+              <Text style={styles.modalText}>Hora de Pick-up:</Text>
+              <Text style={styles.modalItemText}>{selectedOrder?.pickupTime}</Text>
+              <Text style={styles.modalText}>Clave FoodieBox:</Text>
+              <Text style={styles.modalItemText}>{selectedOrder?.clave}</Text>
               <View style={styles.modalButtonContainer}>
-                <TouchableOpacity style={styles.modalButtonClose} onPress={handleCloseModal}>
+                <TouchableOpacity style={styles.modalButtonCancel} onPress={handleCloseModal}>
                   <Text style={styles.modalButtonText}>Cerrar</Text>
                 </TouchableOpacity>
               </View>
@@ -424,8 +331,6 @@ const handleCloseAddProductModal = () => {
     </View>
   );
 };
-
-export default HomeRestaurant;
 
 const styles = StyleSheet.create({
   containerActivityIndicator: {
@@ -598,7 +503,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalButtonCancel: {
-    backgroundColor: '#FF0000',
+    backgroundColor: '#aaa',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
@@ -765,3 +670,5 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
 });
+
+export default HomeRestaurant;
