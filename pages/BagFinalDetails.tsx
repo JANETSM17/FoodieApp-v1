@@ -31,7 +31,9 @@ const BagFinalDetails = () => {
       const correo = await AsyncStorage.getItem('clientEmail');
       if (carritoID && correo) {
         const result = await confirmFoodieBox(carritoID);
-        setFoodieBoxAvailable(result.status);
+        if(result){
+          setFoodieBoxAvailable(result.status);
+        }
         setEmail(correo);
         setCarrito(carritoID)
       }

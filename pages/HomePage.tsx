@@ -34,7 +34,9 @@ function HomePage() {
             await AsyncStorage.setItem('clientEmail', clientInfo.correo);
 
             const comedoresData = await getComedores();
-            setComedores(comedoresData);
+            if(comedoresData){
+                setComedores(comedoresData);
+            }
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {

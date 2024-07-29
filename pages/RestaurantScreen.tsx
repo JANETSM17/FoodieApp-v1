@@ -65,18 +65,23 @@ const RestaurantScreen = () => {
         if (comedorId && clientEmail) {
             const carritoId = await getCarritoID(clientEmail);
             console.log('ID del carrito:', carritoId);
-            setCarrito(carritoId);
+            if(carritoId){
+              setCarrito(carritoId);
             await AsyncStorage.setItem('carritoID', carritoId);
-
+            }
+            
             const comedorInfo = await getComedor(comedorId);
-            setComedor(comedorInfo);
-            setMenuItems({
-                Comida: await getComida(comedorId),
-                Bebidas: await getBebidas(comedorId),
-                Frituras: await getFrituras(comedorId),
-                Dulces: await getDulces(comedorId),
-                Otros: await getOtros(comedorId),
-            });
+            if(comedorInfo){
+              setComedor(comedorInfo);
+              setMenuItems({
+                  Comida: await getComida(comedorId),
+                  Bebidas: await getBebidas(comedorId),
+                  Frituras: await getFrituras(comedorId),
+                  Dulces: await getDulces(comedorId),
+                  Otros: await getOtros(comedorId),
+              });
+            }
+            
         }
     } catch (error) {
         console.error("Error loading comedor data:", error);

@@ -23,7 +23,9 @@ const HistorialRestaurant = () => {
       const clientEmail = await AsyncStorage.getItem('clientEmail');
       if (clientEmail && userType) {
         const orders = await getHistorialPedidos(clientEmail, userType);
-        setOrdersHistory(orders);
+        if(orders){
+          setOrdersHistory(orders);
+        }
       }
     } catch (error) {
       console.error('Error fetching data:', error);
